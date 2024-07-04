@@ -95,7 +95,8 @@
 	}
 }
 
-:host([data-cxp-entered]) #buttons button:hover .label {
+/*:host([data-cxp-entered]) #buttons button:hover .label,*/
+.label[data-cxp-label-entered], .label[data-cxp-label-exited] {
 	
 	animation: bounce .3s ease-out 0s 1 normal forwards running;
 	

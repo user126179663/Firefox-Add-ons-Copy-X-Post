@@ -220,10 +220,23 @@ class ShadowElement {
 		
 	}
 	
-	purge() {
+	purge(preserves, removeOnce) {
 		
-		this.abortLifetimeEvent(),
-		this.element.remove();
+		const { element } = this, { shadowRoot } = element;
+		
+		removeOnce ||= preserves,
+		
+		this.abortLifetimeEvent();
+		
+		for (const child of element.querySelectorAll('[shadow]')) child?.handler?.purge?.(removeOnce);
+		
+		if (shadowRoot instanceof ShadowRoot) {
+			
+			for (const element of shadowRoot.querySelectorAll('[shadow]')) element?.handler?.purge?.(removeOnce);
+			
+		}
+		
+		preserves || element.remove();
 		
 	}
 	

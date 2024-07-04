@@ -13,8 +13,6 @@ class CopyXPost {
 		this.bodyObserverInit = { childList: true, subtree: true },
 		this.mainObserverInit = { childList: true, subtree: true },
 		
-		this.calcButtonBoundEventOption = { once: true },
-		
 		this.cxpAnimationButtonConditions = [
 			{
 				dataset: [ { name: 'cxpSpawned', value: '' } ],
@@ -52,51 +50,16 @@ class CopyXPost {
 		
 	}
 	
-	//static async calcButtonBoundAfterAnyAnimeStarted(event) {
-	//	
-	//	const target = event.target.closest('button');
-	//	let hint;
-	//	
-	//	if (target.dataset.hint && (hint = document.getElementById(target.dataset.hint))) {
-	//		
-	//		delete hint.dataset.cxpHintExiting,
-	//		delete hint.dataset.cxpHintSpawned,
-	//		void hint.offsetWidth;
-	//		
-	//	} else {
-	//		
-	//		(hint = await ShadowElement.create('anime-conditions')).id = target.dataset.hint ??= crypto.randomUUID(),
-	//		hint.conditions =	[
-	//								{
-	//									state: 'begin',
-	//									name: 'hint-spawn',
-	//									measures: [ [ '#' + target.getRootNode().host.id, `[data-hint="${hint.id}"]` ] ]
-	//								},
-	//								{
-	//									state: 'end',
-	//									name: 'hint-exit',
-	//									//dataset: [ { name: 'cxp-hint-spawned' } ],
-	//									purges: true
-	//								}
-	//							],
-	//		hint.toggleAttribute('data-cxp-hint', true)
-	//		
-	//	}
-	//	hi(event);
-	//	hint.textContent = target.dataset.alt,
-	//	hint.toggleAttribute('data-cxp-hint-spawned', true),
-	//	
-	//	hint.isConnected || document.body.appendChild(hint.element),
-	//	
-	//	//ShadowElement.setBoundToCSSVar(target, hint),
-	//	
-	//	event.stopPropagation();
-	//	
-	//}
 	static async enteredButton(event) {
 		
-		const { setBoundToCSSVar } = ShadowElement, { target } = event, { dataset: { alt, hint } } = target;
+		const { target } = event, { dataset: { alt, hint } } = target, label = target.querySelector('.label');
 		let hintNode;
+		
+		label &&	(
+						label.toggleAttribute('data-cxp-label-exited', false),
+						void label.offsetWidth,
+						label.toggleAttribute('data-cxp-label-entered', true)
+					);
 		
 		if (hint && (hintNode = document.getElementById(hint))) {
 			
@@ -119,57 +82,47 @@ class CopyXPost {
 		
 		hintNode.isConnected || document.body.appendChild(hintNode.element),
 		
-		setBoundToCSSVar(hintNode, target),
+		ShadowElement.setBoundToCSSVar(hintNode, target),
 		
 		event.stopPropagation();
 		
 	}
+	
 	static async enteredPost(event) {
 		
-		const	{
-					SELECTOR_CARET,
-					SELECTOR_CXP,
-					calcButtonBoundAfterAnyAnimeStarted,
-					calcButtonBoundEventOption,
-					createCXP,
-					enteredButton,
-					exitedAnimation,
-					leftButton,
-				} = CopyXPost,
-				{ target } = event;
-		let node, handler;
+		const { target } = event;
+		let node;
 		
-		(node = target.querySelector(SELECTOR_CXP)) ??
-			target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.((node = await createCXP()).element),
+		if (!(node = target.querySelector(CopyXPost.SELECTOR_CXP))) {
+			
+			const	{ SELECTOR_CARET, createCXP, enteredButton, exitedAnimation, leftButton } = CopyXPost,
+					{ handler, shadowRoot } = node = await createCXP();
+			
+			target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
+			
+			for (const button of shadowRoot.querySelectorAll('#buttons button'))
+				handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button),
+				handler.addLifetimeEvent('mouseleave', leftButton, undefined, button);
+			
+			handler.addLifetimeEvent('animationend', exitedAnimation);
+			
+		}
 		
-		handler = node.handler;
-		//for (const label of node.shadowRoot.querySelectorAll('#buttons button .label'))
-		//	handler.addLifetimeEvent	(
-		//									'animationstart',
-		//									calcButtonBoundAfterAnyAnimeStarted,
-		//									calcButtonBoundEventOption,
-		//									label
-		//								);
-		for (const button of node.shadowRoot.querySelectorAll('#buttons button'))
-			handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button),
-			handler.addLifetimeEvent('mouseleave', leftButton, undefined, button);
-		
-		node?.toggleAttribute?.('data-cxp-entered', true),
-		node?.removeAttribute?.('data-cxp-left'),
-		node?.handler.addLifetimeEvent?.('animationend', exitedAnimation);
+		node instanceof Element && node.handler instanceof ShadowElement &&
+			(
+				node.toggleAttribute('data-cxp-entered', true),
+				node.removeAttribute('data-cxp-left')
+			);
 		
 	}
+	
 	static exitedAnimation(event) {
 		
-		const { SELECTOR_CXP, exitedAnimation } = CopyXPost, { animationName, target, type } = event;
-		
-		animationName === 'exit' &&	(
-										target.removeAttribute?.('data-cxp-entered'),
-										target.removeAttribute?.('data-cxp-left'),
-										target.removeEventListener(type, exitedAnimation)
-									),
-		
 		event.stopPropagation();
+		
+		const { animationName } = event;
+		
+		animationName === 'exit' && event.target?.handler?.purge?.(undefined, true);
 		
 	}
 	
@@ -219,13 +172,19 @@ class CopyXPost {
 	
 	static async leftButton(event) {
 		
-		const	{ setBoundToCSSVar } = ShadowElement,
-				{ target } = event,
-				hintNode = document.getElementById(target.dataset.hint);
+		const	{ target } = event,
+				hintNode = document.getElementById(target.dataset.hint),
+				label = target.querySelector('.label');
 		
 		hintNode &&	(
 						hintNode.toggleAttribute('data-cxp-hint-exiting', true),
-						setBoundToCSSVar(hintNode, target)
+						ShadowElement.setBoundToCSSVar(hintNode, target)
+					),
+		
+		label &&	(
+						label.toggleAttribute('data-cxp-label-entered', false),
+						void label.offsetWidth,
+						label.toggleAttribute('data-cxp-label-exited', true)
 					);
 		
 	}
@@ -319,35 +278,6 @@ class CopyXPost {
 				};
 		
 		return this.initialized = new Promise(initializing).then(startup);
-		
-	}
-	
-}
-
-class ShadowHintElement extends ShadowAnimationConditionsElement {
-	
-	static {
-		
-		this.$constrained = Symbol('ShadowHintElement.constrained');
-		
-		this.tag = 'hint';
-		
-	}
-	
-	constructor() {
-		
-		super();
-		
-	}
-	
-	get constrained() {
-		
-		return this[ShadowHintElement.$constrained];
-		
-	}
-	set constrained(v) {
-		
-		this[ShadowHintElement.$constrained] = v;
 		
 	}
 	

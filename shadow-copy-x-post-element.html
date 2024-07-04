@@ -1,0 +1,13 @@
+<template>
+	<link data-resource-href="common.css">
+	<link data-resource-href="shadow-copy-x-post-element.css">
+	<div id="root">
+		<div id="buttons">
+			<button id="dev-copy-button" type="button" data-alt="outerHTML をコピーする"><div class="label"><slot name="dev-copy-label"></slot></div></button>
+			<button id="copy-button" type="button" data-alt="ポストをコピーする"><div class="label"><slot name="copy-label"></slot></div></button>
+		</div>
+		<div id="menu">
+			<ul id="menu-list"><slot name="menu-item"></slot></ul>
+		</div>
+	</div>
+</template>

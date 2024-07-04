@@ -1,0 +1,45 @@
+#buttons {
+	
+	display: flex;
+	
+}
+#buttons > button {
+	
+	position: relative;
+	
+}
+#buttons > button:not(:last-child) {
+	
+	margin-right: .5rem; 
+	
+}
+/*
+#buttons > button::after {
+	
+	background: rgba(0,0,0,.5);
+	border-radius: .1rem;
+	box-sizing: border-box;
+	color: rgba(255,255,255,1);
+	content: attr(data-alt);
+	display: block;
+	font: normal normal normal .6rem/1 sans-serif;
+	left: calc((var(--bound-width) - var(--bound-0--after-width)) * .5);
+	letter-spacing: 1px;
+	opacity: 0;
+	padding: .5rem;
+	position: absolute;
+	top: calc((var(--bound-top) - var(--bound-0--after-height)) * -1.1);
+	translate: 0% 0%;
+	width: max-content;
+	z-index: 1;
+	
+}
+#buttons > button:hover::after {
+	
+	opacity: 1;
+	translate: 0% -10%;
+	
+	transition: all .2s ease .5s;
+	
+}
+*/

@@ -1,0 +1,1 @@
+ShadowElement.whenDefinedAll().then(() => new CopyXPost().init());

@@ -1,0 +1,175 @@
+#root {
+	
+	/*display: none !important;*/
+	/*デバッグ用*/ display: none !important;
+	
+}
+:host([data-cxp-entered]) #root {
+	
+	display: flex !important;
+	
+}
+
+#buttons button {
+	
+	cursor: pointer;
+	
+}
+
+#buttons button .label {
+	
+	display: block;
+	pointer-events: none;
+	rotate: 10deg;
+	transform-origin: center bottom;
+	
+}
+:host([data-cxp-entered]) #buttons button .label:not([data-cxp-spawned]) {
+	
+	animation: spawn .3s ease-out 0s 1 normal forwards running;
+	
+}
+:host([data-cxp-left]) #buttons button .label {
+	
+	animation: exit .3s ease-out 0s 1 reverse forwards running;
+	
+}
+@keyframes spawn {
+	0% {
+		opacity: .5;
+		scale: 100% 0%;
+	}
+	5% {
+		opacity: 1;
+		scale: 130% 33%;
+	}
+	15% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	40% {
+		translate: 0 -40%;
+	}
+	50% {
+		translate: 0 -40%;
+	}
+	75% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	87.5% {
+		scale: 130% 75%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+@keyframes exit {
+	0% {
+		opacity: .5;
+		scale: 100% 0%;
+	}
+	5% {
+		opacity: 1;
+		scale: 130% 33%;
+	}
+	15% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	40% {
+		translate: 0 -40%;
+	}
+	50% {
+		translate: 0 -40%;
+	}
+	75% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	87.5% {
+		scale: 130% 75%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+
+:host([data-cxp-entered]) #buttons button:hover .label {
+	
+	animation: bounce .3s ease-out 0s 1 normal forwards running;
+	
+}
+@keyframes bounce {
+	0% {
+		scale: 100% 100%;
+	}
+	33.3% {
+		opacity: 1;
+		scale: 130% 66.7%;
+	}
+	50% {
+		scale: 90% 120%;
+	}
+	75% {
+		scale: 110% 95%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+
+:host([data-cxp-entered]) #buttons button:active .label {
+	
+	animation: shake .3s ease-out 0s 1 normal forwards running;
+	
+}
+@keyframes shake {
+	
+	0% {
+		
+		scale: 100%;
+		
+	}
+	10% {
+		
+		scale: 33%;
+		
+	}
+	20% {
+		
+		scale: 33%;
+		
+	}
+	50% {
+		
+		scale: 120%;
+		
+	}
+	60% {
+		
+		scale: 66.7%;
+		
+	}
+	70% {
+		
+		scale: 110%;
+		
+	}
+	80% {
+		
+		scale: 80%;
+		
+	}
+	90% {
+		
+		scale: 105%;
+		
+	}
+	100% {
+		
+		scale: 100%;
+		
+	}
+	
+}

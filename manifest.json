@@ -8,8 +8,8 @@
 		}
 	},
 	
-	"name": "Copy X Post",
-	"short_name": "cxp",
+	"name": "Backup 𝕏 Post",
+	"short_name": "bxp",
 	"version": "0.1",
 	"description": "Xのポストをコピーします。",
 	
@@ -17,15 +17,15 @@
 		{
 			"css": [ "common.css", "default.css", "shadow-copy-x-post-hint.css" ],
 			"js": [ "utils.js", "shadow-element.js", "copy-x-post.js", "content_script.js" ],
-			"matches": [ "*://x.com/*" ]
+			"matches": [ "*://twitter.com/*", "*://x.com/*" ]
 		}
 	],
 	
-	"host_permissions": [ "*://x.com/*" ],
+	"host_permissions": [ "*://twitter.com/*", "*://x.com/*" ],
 	
 	"web_accessible_resources": [
 		{
-			"matches": [ "*://x.com/*" ],
+			"matches": [ "*://twitter.com/*", "*://x.com/*" ],
 			"resources": [
 				"common.css",
 				"shadow-copy-x-post-element.css",

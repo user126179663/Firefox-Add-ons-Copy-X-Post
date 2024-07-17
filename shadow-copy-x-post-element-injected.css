@@ -1,12 +1,7 @@
 #root {
 	
 	/*display: none !important;*/
-	/*デバッグ用*/ display: none !important;
-	
-}
-:host([data-cxp-entered]) #root {
-	
-	display: flex !important;
+	/*デバッグ用*/ display: flex !important;
 	
 }
 
@@ -24,14 +19,14 @@
 	transform-origin: center bottom;
 	
 }
-:host([data-cxp-entered]) #buttons button .label:not([data-cxp-spawned]) {
+:host(:not([data-cxp-left])) #buttons button .label:not([entered]) {
 	
 	animation: spawn .3s ease-out 0s 1 normal forwards running;
 	
 }
 :host([data-cxp-left]) #buttons button .label {
 	
-	animation: exit .3s ease-out 0s 1 reverse forwards running;
+	animation: exit .3s ease-out 0s 1 reverse forwards running !important;
 	
 }
 @keyframes spawn {
@@ -96,9 +91,10 @@
 }
 
 /*:host([data-cxp-entered]) #buttons button:hover .label,*/
-.label[data-cxp-label-entered], .label[data-cxp-label-exited] {
+:host(:not([data-cxp-left])) #buttons button[entered] .label,
+:host(:not([data-cxp-left])) #buttons button[left] .label {
 	
-	animation: bounce .3s ease-out 0s 1 normal forwards running;
+	animation: bounce .3s ease-out 0s 1 normal forwards running !important;
 	
 }
 @keyframes bounce {
@@ -120,9 +116,9 @@
 	}
 }
 
-:host([data-cxp-entered]) #buttons button:active .label {
+:host(:not([data-cxp-left])) #buttons button:active .label {
 	
-	animation: shake .3s ease-out 0s 1 normal forwards running;
+	animation: shake .3s ease-out 0s 1 normal forwards running !important;
 	
 }
 @keyframes shake {

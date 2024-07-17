@@ -1,3 +1,8 @@
+//todo
+//  ページ読み込み時に既にカーソルがenter状態の時の判定処理(無理？)
+//	mousedown mouseup のイベントリスナーの実装
+// hintからのmouseenter mouseleaveイベントの分離
+
 class CopyXPost {
 	
 	static {
@@ -41,10 +46,15 @@ class CopyXPost {
 		(link = document.createElement('link')).rel = 'stylesheet',
 		shadowRoot.appendChild(link).href = browser.runtime.getURL('shadow-copy-x-post-element-injected.css');
 		
-		for (const label of shadowRoot.querySelectorAll('#buttons button .label'))
-			(await ShadowElement.create('anime-conditions', label)).conditions = cxpAnimationButtonConditions;
+		for (const button of shadowRoot.querySelectorAll('#buttons button')) {
+			
+			await ShadowElement.create('interactive', button);
+			
+			for (const label of button.querySelectorAll('.label')) await ShadowElement.create('interactive', label);
+			
+		}
 		
-		node.id = 'cpx-' + crypto.randomUUID();
+		node.id = 'cxp-' + crypto.randomUUID();
 		
 		return node;
 		
@@ -52,37 +62,24 @@ class CopyXPost {
 	
 	static async enteredButton(event) {
 		
-		const { target } = event, { dataset: { alt, hint } } = target, label = target.querySelector('.label');
+		const { target } = event, { dataset: { constrainedHint } } = target, label = target.querySelector('.label');
 		let hintNode;
 		
-		label &&	(
-						label.toggleAttribute('data-cxp-label-exited', false),
-						void label.offsetWidth,
-						label.toggleAttribute('data-cxp-label-entered', true)
-					);
+		//label &&	(
+		//				label.toggleAttribute('data-cxp-label-exited', false),
+		//				void label.offsetWidth,
+		//				label.toggleAttribute('data-cxp-label-entered', true)
+		//			);
 		
-		if (hint && (hintNode = document.getElementById(hint))) {
-			
-			delete hintNode.dataset.cxpHintExiting,
-			delete hintNode.dataset.cxpHintSpawned,
-			void hintNode.offsetWidth;
-			
-		} else {
-			
-			const { id } =	(hintNode = await ShadowElement.create('anime-conditions')).id =
-								target.dataset.hint ??= crypto.randomUUID();
-			
-			hintNode.conditions = [ { state: 'end', name: 'hint-exit', purges: true } ],
-			hintNode.toggleAttribute('data-cxp-hint', true);
-			
-		}
-		
-		hintNode.textContent = target.dataset.alt,
-		hintNode.toggleAttribute('data-cxp-hint-spawned', true),
-		
-		hintNode.isConnected || document.body.appendChild(hintNode.element),
-		
-		ShadowElement.setBoundToCSSVar(hintNode, target),
+		(constrainedHint && (hintNode = document.getElementById(constrainedHint))) ||
+			(
+				(hintNode = await ShadowElement.create('hint')).constrained = target,
+				hintNode.enterAnime = 'hint-spawn',
+				hintNode.leaveAnime = 'hint-exit',
+				hintNode.sbcvAfterAnime = 'enter-anime-begun',
+				hintNode.purgeAfterAnime = 'leave-anime-ended',
+				document.body.prepend(hintNode.element)
+			),
 		
 		event.stopPropagation();
 		
@@ -91,28 +88,31 @@ class CopyXPost {
 	static async enteredPost(event) {
 		
 		const { target } = event;
-		let node;
+		let node, handler;
 		
-		if (!(node = target.querySelector(CopyXPost.SELECTOR_CXP))) {
+		if (node = target.querySelector(CopyXPost.SELECTOR_CXP)) {
 			
-			const	{ SELECTOR_CARET, createCXP, enteredButton, exitedAnimation, leftButton } = CopyXPost,
-					{ handler, shadowRoot } = node = await createCXP();
+			handler = node.handler,
+			node.toggleAttribute('data-cxp-left', false);
+			
+		} else {
+			
+			const	{ SELECTOR_CARET, createCXP, enteredButton, exitedAnimation, leftButton, leftPost } = CopyXPost,
+					{ shadowRoot } = node = await createCXP();
+			
+			handler = node.handler;
+			
+			for (const button of shadowRoot.querySelectorAll('#buttons button'))
+				handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button);
+			
+			handler.addLifetimeEvent('animationend', exitedAnimation),
 			
 			target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
 			
-			for (const button of shadowRoot.querySelectorAll('#buttons button'))
-				handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button),
-				handler.addLifetimeEvent('mouseleave', leftButton, undefined, button);
-			
-			handler.addLifetimeEvent('animationend', exitedAnimation);
-			
 		}
 		
-		node instanceof Element && node.handler instanceof ShadowElement &&
-			(
-				node.toggleAttribute('data-cxp-entered', true),
-				node.removeAttribute('data-cxp-left')
-			);
+		node instanceof Element && handler instanceof ShadowElement &&
+			node.toggleAttribute('data-cxp-exited', false);
 		
 	}
 	
@@ -120,100 +120,35 @@ class CopyXPost {
 		
 		event.stopPropagation();
 		
-		const { animationName } = event;
+		const { animationName, target } = event;
 		
-		animationName === 'exit' && event.target?.handler?.purge?.(undefined, true);
-		
-	}
-	
-	// ユーティリティー関数
-	// 第一引数 mrs に指定された MurationRecords プロパティ addedNodes, removedNodes を対象に、
-	// 第二引数 selector に一致する要素ないしその子孫か先祖を Array に列挙して戻り値にする。
-	// 第三引数 isAdded に true を指定した場合 addedNodes、そうでない場合は removedNodes を対象にする。
-	static getElementsFromMRs(mrs, selector, isAdded) {
-		
-		const	{ ELEMENT_NODE } = Node,
-				{ length } = mrs,
-				nodes = [],
-				targetName = (isAdded ? 'add' : 'remov') + 'edNodes';
-		let i,i0,l0,i1,l1,i2,l2,i3, targets, target, selected, selectedNode;
-		
-		i = i3 = -1;
-		while (++i < length) {
-			
-			i0 = -1, l0 = (targets = mrs[i][targetName])?.length;
-			while (++i0 < l0) {
-				
-				if ((target = targets[i0]).nodeType === ELEMENT_NODE) {
-					
-					target.matches(selector) && (nodes[++i3] = target),
-					(selected = target.closest(selector)) && (nodes[++i3] = selected);
-					
-					if (l1 = (selected = target.querySelectorAll(selector)).length) {
-						
-						i1 = -1, l2 = i3 + 1;
-						while (++i1 < l1) {
-							i2 = -1, selectedNode = selected[i1];
-							while (++i2 < l2 && nodes[i2] !== selectedNode);
-							i2 === i3 || (nodes[i3 = l2++] = selectedNode);
-						}
-						
-					}
-					
-				}
-				
-			}
-			
-		}
-		
-		return nodes;
+		animationName === 'exit' && target?.handler?.purge?.(undefined, true);
 		
 	}
 	
-	static async leftButton(event) {
-		
-		const	{ target } = event,
-				hintNode = document.getElementById(target.dataset.hint),
-				label = target.querySelector('.label');
-		
-		hintNode &&	(
-						hintNode.toggleAttribute('data-cxp-hint-exiting', true),
-						ShadowElement.setBoundToCSSVar(hintNode, target)
-					),
-		
-		label &&	(
-						label.toggleAttribute('data-cxp-label-entered', false),
-						void label.offsetWidth,
-						label.toggleAttribute('data-cxp-label-exited', true)
-					);
-		
-	}
 	static leftPost(event) {
 		
-		const { target } = event;
-		
-		target.querySelector(CopyXPost.SELECTOR_CXP)?.toggleAttribute?.('data-cxp-left', true);
+		event.target.querySelector(CopyXPost.SELECTOR_CXP)?.toggleAttribute?.('data-cxp-left', true);
 		
 	}
 	
 	static async mutatedMainNodeChildList(mrs) {
 		
 		const	{ runtime } = browser,
-				{ SELECTOR_CXP, SELECTOR_POST, getElementsFromMRs } = CopyXPost,
-				posts = getElementsFromMRs(mrs, SELECTOR_POST, true),
+				{ SELECTOR_CXP, SELECTOR_POST } = CopyXPost,
+				{ added: posts, removed: removedPosts } = ShadowElement.getElementsFromMRs(mrs, SELECTOR_POST),
 				{ length: postsLength } = posts,
-				removedNodes = getElementsFromMRs(mrs, SELECTOR_POST),
-				{ length: removedNodesLength } = removedNodes;
+				{ length: removedPostsLength } = removedPosts;
 		
 		if (postsLength) {
 			
 			const { SELECTOR_CARET, enteredPost, leftPost } = CopyXPost;
-			let i, caret, post, node, copyLabel, link;
+			let i, post;
 			
 			i = -1;
 			while (++i < postsLength)	(
-											!(node = (post = posts[i]).querySelector(SELECTOR_CXP)) &&
-											(caret = post.querySelector(SELECTOR_CARET))
+											!(post = posts[i]).querySelector(SELECTOR_CXP) &&
+											post.querySelector(SELECTOR_CARET)
 										) &&
 											(
 												post.addEventListener('mouseenter', enteredPost),
@@ -222,13 +157,13 @@ class CopyXPost {
 			
 		}
 		
-		if (removedNodesLength) {
+		if (removedPostsLength) {
 			
 			const { enteredPost, leftPost } = CopyXPost;
-			let i, node, post;
+			let i, post;
 			
 			i = -1;
-			while (++i < removedNodesLength)	(post = removedNodes[i]).removeEventListener('mouseover', enteredPost),
+			while (++i < removedPostsLength)	(post = removedPosts[i]).removeEventListener('mouseenter', enteredPost),
 												post.removeEventListener('mouseleave', leftPost);
 			
 		}
@@ -283,7 +218,7 @@ class CopyXPost {
 	
 }
 
-class ShadowScraperElement extends ShadowElement {
+class ShadowScraperElement extends ShadowInteractiveElement {
 	
 	static {
 		
@@ -332,7 +267,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 		this.SELECTOR_POST = CopyXPost.SELECTOR_POST,
 		
 		this.tag = 'cxp',
-		this.templateURL = 'shadow-copy-x-post-element.html'
+		this.templateURL = 'shadow-copy-x-post-element.html';
 		
 	}
 	
@@ -424,3 +359,337 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 	
 }
 ShadowCopyXPostElement.define();
+
+class ShadowHintElement extends ShadowInteractiveElement {
+	
+	static {
+		
+		this.$constrained = Symbol('ShadowHintElement.constrained');
+		
+		this.tag = 'hint',
+		
+		this.observedAttributeInit = { attributes: true, attributeFilter: [ 'id' ] },
+		
+		this.resetAnimeTriggerBefore =
+			{
+				attr:	[
+							{ method: 'remove', name: 'enter-anime-begun' },
+							{ method: 'remove', name: 'enter-anime-ended' },
+							{ method: 'remove', name: 'entered' },
+							{ method: 'remove', name: 'left' },
+							{ method: 'remove', name: 'leave-anime-begun' },
+							{ method: 'remove', name: 'leave-anime-ended' },
+							{ method: 'remove', name: 'press-anime-begun' },
+							{ method: 'remove', name: 'press-anime-ended' },
+							{ method: 'remove', name: 'pressed' },
+							{ method: 'remove', name: 'release-anime-begun' },
+							{ method: 'remove', name: 'release-anime-ended' },
+							{ method: 'remove', name: 'release-anime-begun' },
+							{ method: 'remove', name: 'released' },
+							{ method: 'remove', name: 'exiting' }
+						]
+			};
+		
+	}
+	
+	static attributeChangedCallback(mrs) {
+		
+		const { length } = mrs;
+		let i;
+		
+		i = -1;
+		while (++i < length) {
+			
+			switch (mrs[i].attributeName) {
+				
+				case 'id':
+				
+				const { constrained } = this;
+				
+				constrained instanceof Element && (constrained.dataset.constrainedHint = this.element.id);
+				
+				break;
+				
+			}
+			
+		}
+		
+	}
+	
+	static changedAnimationState(event) {
+		
+		Object.getPrototypeOf(this.constructor).changedAnimationState.call(this, event, this.constrained);
+		
+	}
+	
+	// このイベントハンドラーは、既に場に現われたヒントが、いったんそれに紐付けられた要素からカーソルが外れ、
+	// 退出処理（アニメ）が開始され始めた時に、再度紐付けられた要素にカーソルが合わせられた時にのみ起動することを想定している。
+	// 現状は問題ないが、例えば mouseenter 以外の方法でヒントを表示した場合に対応できないなど、汎用的な仕様ではないことが想像される。
+	static enteredConstrained(event) {
+		hi();
+		this.resetAnime();
+		
+	}
+	
+	static leftConstrained(event) {
+		
+		this.enterAnimeBegun ? (this.exiting = true) : this.purge(undefined, true);
+		
+	}
+	
+	constructor() {
+		
+		super();
+		
+		const	{
+					attributeChangedCallback,
+					began,
+					condition,
+					enteredConstrained,
+					leftConstrained,
+					observedAttributeInit
+				} = ShadowHintElement;
+		
+		this.enteredConstrained = enteredConstrained.bind(this),
+		this.leftConstrained = leftConstrained.bind(this),
+		
+		(new MutationObserver(this.attributeChangedCallback = attributeChangedCallback.bind(this))).
+			observe(this.element, observedAttributeInit);
+		
+	}
+	
+	constrain(constrained) {
+		
+		const	{ $constrained } = ShadowHintElement,
+				handler = this instanceof ShadowHintElement ? this : this.handler,
+				{ enteredConstrained, leftConstrained } = handler,
+				lastConstrained = handler[$constrained];
+		
+		constrained = handler[$constrained] =
+			constrained instanceof Element ? constrained :
+				constrained instanceof ShadowElement ? constrained.element :
+					constrained === undefined ? lastConstrained : null,
+		
+		lastConstrained instanceof Element && (!constrained || constrained !== lastConstrained) && 
+			(
+				delete lastConstrained.dataset.constrainedHint,
+				lastConstrained.removeEventListener('mouseenter', enteredConstrained),
+				lastConstrained.removeEventListener('mouseleave', leftConstrained)
+			);
+		
+		if (constrained) {
+			
+			const { element } = handler, { dataset } = constrained;
+			
+			(element.id ||= crypto.randomUUID()) === dataset.constrainedHint || (dataset.constrainedHint = element.id),
+			element.dataset.alt = dataset.hintAlt,
+			ShadowElement.setBoundToCSSVar(element, constrained),
+			
+			handler.addLifetimeEvent('mouseenter', enteredConstrained, undefined, constrained),
+			handler.addLifetimeEvent('mouseleave', leftConstrained, undefined, constrained);
+			
+		}
+		
+	}
+	
+	get constrained() {
+		
+		return this[ShadowHintElement.$constrained];
+		
+	}
+	set constrained(v) {
+		
+		this.constrain(v);
+		
+	}
+	get exiting() {
+		
+		return this.element.hasAttribute('exiting');
+		
+	}
+	set exiting(v) {
+		
+		this.constrain(),
+		
+		this.element.toggleAttribute('exiting', !!v);
+		
+	}
+	
+}
+//class ShadowHintElement extends ShadowInteractiveElement {
+//	
+//	static {
+//		
+//		this.$constrained = Symbol('ShadowHintElement.constrained');
+//		
+//		this.condition = { state: 'end', name: 'hint-exit', purges: true },
+//		this.resetAnimeTriggerBefore =
+//			{ attr: [ { method: 'remove', name: 'exiting' }, { method: 'remove', name: 'spawned' } ] },
+//		this.tag = 'hint',
+//		
+//		this.observedAttributeInit = { attributes: true, attributeFilter: [ 'exit-name', 'id' ] };
+//		
+//	}
+//	
+//	static attributeChangedCallback(mrs) {
+//		
+//		const { length } = mrs;
+//		let i;
+//		
+//		i = -1;
+//		while (++i < length) {
+//			
+//			switch (mrs[i].attributeName) {
+//				
+//				case 'exit-name':
+//				this.conditions = [ { ...ShadowHintElement.condition, name: this.exitName } ];
+//				break;
+//				
+//				case 'id':
+//				
+//				const { constrained } = this;
+//				
+//				constrained instanceof Element && (constrained.dataset.constrainedHint = this.element.id);
+//				
+//				break;
+//				
+//			}
+//			
+//		}
+//		
+//	}
+//	
+//	static began(event) {
+//		
+//		const { animationName } = event, { exitName, spawnName } = this;
+//		
+//		((animationName === spawnName && (this.spawned = true)) || animationName === exitName) &&
+//			this.constrain();
+//		
+//	}
+//	
+//	static enteredConstrained(event) {
+//		
+//		this.resetAnime();
+//		
+//	}
+//	
+//	static leftConstrained(event) {
+//		
+//		this.enterAnimeBegun ? (this.exiting = true) : this.purge(undefined, true);
+//		
+//	}
+//	
+//	constructor() {
+//		
+//		super();
+//		
+//		const	{
+//					attributeChangedCallback,
+//					began,
+//					condition,
+//					enteredConstrained,
+//					leftConstrained,
+//					observedAttributeInit
+//				} = ShadowHintElement;
+//		
+//		this.enteredConstrained = enteredConstrained.bind(this),
+//		this.leftConstrained = leftConstrained.bind(this),
+//		
+//		(new MutationObserver(this.attributeChangedCallback = attributeChangedCallback.bind(this))).
+//			observe(this.element, observedAttributeInit),
+//		
+//		this.conditions = [ { ...condition } ],
+//		
+//		this.addLifetimeEvent('animationstart', this.began = ShadowHintElement.began.bind(this));
+//		
+//	}
+//	
+//	constrain(constrained) {
+//		
+//		const	{ $constrained } = ShadowHintElement,
+//				handler = this instanceof ShadowHintElement ? this : this.handler,
+//				{ enteredConstrained, leftConstrained } = handler,
+//				lastConstrained = handler[$constrained];
+//		
+//		lastConstrained instanceof Element &&
+//			(
+//				delete lastConstrained.dataset.constrainedHint,
+//				lastConstrained.removeEventListener('mouseenter', enteredConstrained),
+//				lastConstrained.removeEventListener('mouseleave', leftConstrained)
+//			);
+//		
+//		if (
+//				constrained = handler[$constrained] =	constrained instanceof Element ? constrained :
+//															constrained instanceof ShadowElement ? constrained.element :
+//																constrained === undefined ? lastConstrained : null
+//		) {
+//			
+//			const { element } = this, { dataset } = constrained;
+//			
+//			(element.id ||= crypto.randomUUID()) === dataset.constrainedHint || (dataset.constrainedHint = element.id),
+//			element.dataset.alt = dataset.hintAlt,
+//			ShadowElement.setBoundToCSSVar(element, constrained),
+//			
+//			this.addLifetimeEvent('mouseenter', enteredConstrained, undefined, constrained),
+//			this.addLifetimeEvent('mouseenter', leftConstrained, undefined, constrained);
+//			
+//		}
+//		
+//	}
+//	
+//	get constrained() {
+//		
+//		return this[ShadowHintElement.$constrained];
+//		
+//	}
+//	set constrained(v) {
+//		
+//		this.constrain(v);
+//		
+//	}
+//	get exiting() {
+//		
+//		return this.element.hasAttribute('exiting');
+//		
+//	}
+//	set exiting(v) {
+//		
+//		this.constrain(),
+//		
+//		this.element.toggleAttribute('exiting', !!v);
+//		
+//	}
+//	get exitName() {
+//		
+//		return this.element.getAttribute('exit-name');
+//		
+//	}
+//	set exitName(v) {
+//		
+//		this.element.setAttribute('exit-name', v);
+//		
+//	}
+//	get spawned() {
+//		
+//		return this.element.hasAttribute('spawned');
+//		
+//	}
+//	set spawned(v) {
+//		
+//		this.element.toggleAttribute('spawned', !!v);
+//		
+//	}
+//	get spawnName() {
+//		
+//		return this.element.getAttribute('spawn-name');
+//		
+//	}
+//	set spawnName(v) {
+//		
+//		this.element.setAttribute('spawn-name', v);
+//		
+//	}
+//	
+//}
+ShadowHintElement.define();

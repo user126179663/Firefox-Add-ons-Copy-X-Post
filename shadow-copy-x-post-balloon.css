@@ -1,29 +1,102 @@
 [shadow="balloon"] {
 	
-	--balloon-bg-color: rgba(255,255,255,1);
+	--balloon-bg-color: var(--accent-color, rgba(255,255,255,1));
 	--balloon-border-color: rgba(0,0,0,1);
 	--balloon-border-width-value: 1;
 	--balloon-border-width: calc(1px * var(--balloon-border-width-value));
 	
-	--balloon-direction-size: 10px;
+	--balloon-direction-size: 6px;
 	--balloon-direction-positioin-ratio-x: .2;
 	
+	--balloon-direction-after-translate: 0 calc(100% - var(--balloon-border-width) * 2);
+	
+	--balloon-spawn-duration: .3s;
+	
+	--balloon-glimmer-size-width: 128px;
+	--balloon-glimmer-size-height: 100%;
+	--balloon-glimmer-position-x: calc(var(--balloon-glimmer-size-width) * -1);
+	--balloon-glimmer-bg-image:
+		linear-gradient(-75deg, transparent 0%, transparent 10%, white 10.1%, white 80%, transparent 90.1%);
+	
 	background: var(--balloon-bg-color);
-	border-radius: .4rem;
-	box-shadow: 0 0 0 var(--balloon-border-width) var(--balloon-border-color), 0 0 .5rem 1px rgba(0,0,0,.25);
+	border-radius: .3rem;
+	box-shadow: 0 0 0 var(--balloon-border-width) var(--balloon-border-color), 0 0 .5rem 1px rgba(0,0,0,.2);
 	font: normal normal normal .6rem/1 sans-serif;
 	left: calc(var(--bound-1-left) + var(--scroll-x) + (var(--bound-1-width) - (var(--bound-width) * var(--balloon-direction-positioin-ratio-x) * 2)) / 2);
-	padding: .6rem;
+	padding: .5rem .6rem;
 	pointer-events: none;
 	position: absolute;
-	top: calc((var(--bound-1-top) + var(--scroll-y) + var(--bound-height) * -1.5));
-	transform-origin: left bottom;
+	top: calc((var(--bound-1-top) + var(--scroll-y) + var(--bound-height) * -1.4));
+	transform-origin: center bottom;
 	z-index: 2;
+	
+}
+[shadow="balloon"].checked {
+	
+	--balloon-bg-color: var(--accent-color, rgba(40,220,80,1));
+	--balloon-border-color: rgba(40,160,80,1);
+	--balloon-border-width-value: 2;
+	
+	--balloon-check-mark-width: 3px;
+	--balloon-check-mark-bound-height: .5rem;
+	--balloon-check-mark-bound-width: .8rem;
+	--balloon-check-color: rgba(255,255,255,1);
+	
+}
+[shadow="balloon"].flat:not(html) {
+	
+	--balloon-border-width-value: 0;
+	--balloon-direction-before-display: none;
+	--balloon-direction-after-translate: 0 90%;
 	
 }
 [shadow="balloon"].initiated {
 	
-	animation: spawn .3s ease-out 0s 1 normal forwards running;
+	--balloon-glimmer-duration: calc(var(--balloon-spawn-duration) * 1);
+	
+	animation: balloon-spawn var(--balloon-spawn-duration) ease 0s 1 normal forwards running;
+	
+}
+[shadow="balloon"].checked.initiated {
+	
+	animation:	balloon-spawn var(--balloon-spawn-duration) ease 0s 1 normal forwards running,
+				balloon-glimmer var(--balloon-glimmer-duration) ease 0s 1 normal forwards running;
+	
+}
+@keyframes balloon-spawn {
+	
+	0% {
+		background: rgba(255,255,255,1);
+		rotate: y 270deg;
+		translate: 0 .8rem;
+	}
+	67% {
+		background: var(--accent-color);
+		rotate: y 360deg;
+	}
+	100% {
+		translate: 0;
+		rotate: y 360deg;
+	}
+	
+}
+@keyframes balloon-glimmer {
+	
+	from {
+		
+		background:	calc(var(--balloon-glimmer-size-width) * -1) top/
+					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
+					no-repeat
+					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
+		
+	}
+	to {
+		
+		background:	calc(100% + var(--balloon-glimmer-size-width) * 1) top/
+					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
+					no-repeat
+					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
+	}
 	
 }
 [shadow="balloon"].initiated[enter-anime-ended] {
@@ -41,43 +114,64 @@
 	
 	border-bottom: var(--balloon-direction-size) solid rgba(0,0,0,0);
 	border-left: var(--balloon-direction-size) solid var(--balloon-border-color);
+	bottom: 0;
 	box-sizing: border-box;
 	content: "";
 	display: block;
 	position: absolute;
 	translate: 0 100%;
 	left: calc(var(--bound-width) * var(--balloon-direction-positioin-ratio-x));
-	bottom: 0;
+	
+}
+[shadow="balloon"].flat::after,
+[shadow="balloon"].flat::before {
+	
+	translate: 0 75% !important;
+	
+}
+[shadow="balloon"].checked::after,
+[shadow="balloon"].checked::before {
+	
+	transform-origin: center top;
+	animation: balloon-direction-glimmer calc(var(--balloon-glimmer-duration) * 1.1) ease-out 0s 1 normal forwards running;
+	
+}
+@keyframes balloon-direction-glimmer {
+	
+	0% {
+		scale: 100% 0;
+	}
+	33% {
+		scale: 100% 0;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+	
+}
+[shadow="balloon"]::before {
+	
+	display: var(--balloon-direction-before-display, block) !important;
 	
 }
 [shadow="balloon"]::after {
 	
 	border-top: 2px solid var(--balloon-bg-color);
 	border-left-color: var(--balloon-bg-color);
-	translate: 0 calc(100% - var(--balloon-border-width) * 2);
+	translate: var(--balloon-direction-after-translate) !important;
 	scale: calc(1 - var(--balloon-border-width-value) / 20);
 	
 }
 
-[shadow="balloon"].checked {
-	
-	--balloon-bg-color: rgba(40,200,80,1);
-	--balloon-border-color: rgba(40,160,80,1);
-	--balloon-border-width-value: 2;
-	--balloon-border-width: calc(1px * var(--balloon-border-width-value));
-	
-}
 [shadow="balloon"].checked .content::before {
 	
-	--color: rgba(255,255,255,1);
-	
-	border-left: 4px solid var(--color);
-	border-bottom: 4px solid var(--color);
+	border-left: var(--balloon-check-mark-width) solid var(--balloon-check-color);
+	border-bottom: var(--balloon-check-mark-width) solid var(--balloon-check-color);
 	box-sizing: border-box;
 	content: "";
 	display: block;
-	height: .6rem;
+	height: var(--balloon-check-mark-bound-height);
 	rotate: -45deg;
-	width: .9rem;
+	width: var(--balloon-check-mark-bound-width);
 	
 }

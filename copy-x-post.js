@@ -7,8 +7,10 @@ class CopyXPost {
 	
 	static {
 		
+		this.SELECTOR_REACT_ROOT = '#react-root',
 		this.SELECTOR_MAIN_NODE = 'main[role="main"]',
-		this.SELECTOR_POST = 'article[data-testid="tweet"]',
+		this.SELECTOR_NEW_POST_BUTTON = 'header[role="banner"] a[data-testid="SideNav_NewTweet_Button"]',
+		this.SELECTOR_POST = 'main[role="main"] article[data-testid="tweet"]',
 		this.SELECTOR_CXP = 'div[shadow="cxp"]',
 		this.SELECTOR_CARET = '[data-testid="caret"]',
 		this.POST_TEXT_SELECTOR = '[data-testid="tweetText"]',
@@ -16,7 +18,9 @@ class CopyXPost {
 		this.rxEmoji = /^https:\/\/.*?\.twimg\.com\/emoji\/.*?$/,
 		
 		this.bodyObserverInit = { childList: true, subtree: true },
+		this.rootObserverInit = { childList: true, subtree: true },
 		this.mainObserverInit = { childList: true, subtree: true },
+		this.bannerObserverInit = { childList: true, subtree: true },
 		
 		this.cxpAnimationButtonConditions = [
 			{
@@ -138,13 +142,16 @@ class CopyXPost {
 		
 	}
 	
-	static async mutatedMainNodeChildList(mrs) {
+	static async mutatedRootNodeChildList(mrs) {
 		
 		const	{ runtime } = browser,
-				{ SELECTOR_CXP, SELECTOR_POST } = CopyXPost,
-				{ added: posts, removed: removedPosts } = ShadowElement.getElementsFromMRs(mrs, SELECTOR_POST),
+				{ getElementsFromMRs } = ShadowElement,
+				{ SELECTOR_CXP, SELECTOR_NEW_POST_BUTTON, SELECTOR_POST } = CopyXPost,
+				{ added: posts, removed: removedPosts } = getElementsFromMRs(mrs, SELECTOR_POST),
+				{ added: newPostButtons } = getElementsFromMRs(mrs, SELECTOR_NEW_POST_BUTTON),
 				{ length: postsLength } = posts,
-				{ length: removedPostsLength } = removedPosts;
+				{ length: removedPostsLength } = removedPosts,
+				{ length: newPostButtonsLength } = newPostButtons;
 		
 		if (postsLength) {
 			
@@ -174,44 +181,46 @@ class CopyXPost {
 			
 		}
 		
+		newPostButtonsLength &&
+			document.body.style.setProperty('--accent-color', getComputedStyle(newPostButtons[0]).backgroundColor);
+		
 	}
 	
-	static startup(mainNode) {
+	static startup(xRootNode) {
 		
-		const { mainObserverInit } = CopyXPost, { mutatedMainNodeChildList } = this;
-		
-		this.mainObserver = new MutationObserver(mutatedMainNodeChildList).observe(mainNode, mainObserverInit);
+		(this.rootObserver = new MutationObserver(this.mutatedRootNodeChildList)).
+			observe(xRootNode, CopyXPost.rootObserverInit);
 		
 	}
 	
 	constructor() {
 		
-		const { mutatedMainNodeChildList, startup } = CopyXPost;
+		const { mutatedRootNodeChildList, startup } = CopyXPost;
 		
-		this.mutatedMainNodeChildList = mutatedMainNodeChildList.bind(this),
+		this.mutatedRootNodeChildList = mutatedRootNodeChildList.bind(this),
 		this.startup = startup.bind(this);
 		
 	}
 	
 	init() {
 		
-		const	{ SELECTOR_MAIN_NODE, bodyObserverInit } = CopyXPost,
+		const	{ SELECTOR_REACT_ROOT, bodyObserverInit } = CopyXPost,
 				{ startup } = this,
 				initializing = (rs, rj) => {
 					
-					(this.mainNode = document.querySelector(SELECTOR_MAIN_NODE)) ?
-						rs(this.mainNode) :
+					(this.xRootNode = document.querySelector(SELECTOR_REACT_ROOT)) ?
+						rs(this.xRootNode) :
 						(
 							this.bodyObserver =
 								new MutationObserver
 									(
 										mrs =>	{
-													const mainNode = document.querySelector(SELECTOR_MAIN_NODE);
+													const xRootNode = document.querySelector(SELECTOR_REACT_ROOT);
 													
-													mainNode &&	(
-																	this.bodyObserver.disconnect(),
-																	rs(this.mainNode = mainNode)
-																);
+													xRootNode &&	(
+																		this.bodyObserver.disconnect(),
+																		rs(this.xRootNode = xRootNode)
+																	);
 												}
 									)
 						).observe(document.body, bodyObserverInit);
@@ -273,18 +282,18 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 		this.SELECTOR_POST = CopyXPost.SELECTOR_POST,
 		
 		this.tag = 'cxp',
-		this.templateURL = 'shadow-copy-x-post-element.html',
+		this.templateURL = 'shadow-copy-x-post-element.html';
 		
-		this.balloonResetAnimeTriggerBefore =
-			{
-				attr:	[
-							{ method: 'remove', name: 'enter-anime-begun' },
-							{ method: 'remove', name: 'enter-anime-ended' },
-							{ method: 'remove', name: 'initiated' },
-							{ method: 'remove', name: 'leave-anime-begun' },
-							{ method: 'remove', name: 'leave-anime-ended' }
-						]
-			};;
+		//this.balloonResetAnimeTriggerBefore =
+		//	{
+		//		attr:	[
+		//					{ method: 'remove', name: 'enter-anime-begun' },
+		//					{ method: 'remove', name: 'enter-anime-ended' },
+		//					{ method: 'remove', name: 'initiated' },
+		//					{ method: 'remove', name: 'leave-anime-begun' },
+		//					{ method: 'remove', name: 'leave-anime-ended' }
+		//				]
+		//	};;
 		
 	}
 	
@@ -360,13 +369,16 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 					{ handler } = target,
 					balloon = document.getElementById(constrainedAboutBalloon);
 			
-			balloon ?
-				animationName === handler.leaveAnime ?
-					(balloon.handler.resetAnime(), balloon.handler.finish = true) :
-					balloon.handler.finish && balloon.handler.resetAnime() :
-				target.removeEventListener(type, ShadowCopyXPostElement.notifyEndToBalloon);
+			balloon.hasAttribute('leave-anime-begun') ||
+				(
+					balloon ?
+						animationName === handler.leaveAnime ?
+							(balloon.handler.resetAnime(), balloon.handler.finish = true) :
+							balloon.handler.finish && balloon.handler.resetAnime() :
+						target.removeEventListener(type, ShadowCopyXPostElement.notifyEndToBalloon)
+				);
 			
-			hi(target, balloon, animationName, handler.leaveAnime, animationName === handler.leaveAnime,balloon.handler.finish);
+			//hi(target, balloon, animationName, handler.leaveAnime, animationName === handler.leaveAnime,balloon.handler.finish);
 		}
 		
 	}
@@ -386,8 +398,8 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 			balloonContent.classList.add('content'),
 			balloon.appendChild(balloonContent),
 			
-			balloon.classList.add('checked'),
-			balloon.enterAnime = 'spawn',
+			balloon.classList.add('checked', 'flat'),
+			balloon.enterAnime = 'balloon-spawn',
 			balloon.leaveAnime = 'exit',
 			//balloon.sbcvAfterAnime = 'enter-anime-begun',
 			//balloon.purgeAfterAnime = 'leave-anime-ended',

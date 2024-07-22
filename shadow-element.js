@@ -904,57 +904,161 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		this.requirementsForPurgeAfter = null,
 		this.requirementsForSBCVA = null,
 		
+		this.resetAnimeTriggerBefore =
+			{
+				attr:	[
+							{ name: 'enter-anime-begun', method: 'toggle', value: false },
+							{ name: 'enter-anime-iterating', method: 'toggle', value: false },
+							{ name: 'enter-anime-canceled', method: 'toggle', value: false },
+							{ name: 'enter-anime-ended', method: 'toggle', value: false },
+							{ name: 'enter-interrupted', method: 'toggle', value: false },
+							{ name: 'entered', method: 'toggle', value: false },
+							{ name: 'initiate-anime-begun', method: 'toggle', value: false },
+							{ name: 'initiate-anime-iterating', method: 'toggle', value: false },
+							{ name: 'initiate-anime-canceled', method: 'toggle', value: false },
+							{ name: 'initiate-interrupted', method: 'toggle', value: false },
+							{ name: 'initiated', method: 'toggle', value: false },
+							{ name: 'interrupted-enter-anime', method: 'toggle', value: false },
+							{ name: 'interrupted-initiate-anime', method: 'toggle', value: false },
+							{ name: 'interrupted-leave-anime', method: 'toggle', value: false },
+							{ name: 'interrupted-press-anime', method: 'toggle', value: false },
+							{ name: 'interrupted-release-anime', method: 'toggle', value: false },
+							{ name: 'leave-anime-begun', method: 'toggle', value: false },
+							{ name: 'leave-anime-iterating', method: 'toggle', value: false },
+							{ name: 'leave-anime-canceled', method: 'toggle', value: false },
+							{ name: 'leave-anime-ended', method: 'toggle', value: false },
+							{ name: 'leave-interrupted', method: 'toggle', value: false },
+							{ name: 'left', method: 'toggle', value: false },
+							{ name: 'press-anime-begun', method: 'toggle', value: false },
+							{ name: 'press-anime-iterating', method: 'toggle', value: false },
+							{ name: 'press-anime-canceled', method: 'toggle', value: false },
+							{ name: 'press-anime-ended', method: 'toggle', value: false },
+							{ name: 'press-interrupted', method: 'toggle', value: false },
+							{ name: 'pressed', method: 'toggle', value: false },
+							{ name: 'release-anime-begun', method: 'toggle', value: false },
+							{ name: 'release-anime-iterating', method: 'toggle', value: false },
+							{ name: 'release-anime-canceled', method: 'toggle', value: false },
+							{ name: 'release-anime-ended', method: 'toggle', value: false },
+							{ name: 'release-interrupted', method: 'toggle', value: false },
+							{ name: 'released', method: 'toggle', value: false },
+							{ name: 'out-of-bound', method: 'toggle', value: false }
+						]
+			},
+		
 		this.state = {
 			
 			anime: [
+				
 				{
 					eventType: 'animationstart',
+					iterationName: 'enterAnimeIterating',
 					name: 'enterAnimeBegun',
 					value: 'enter-anime-begun',
 					valueName: 'enterAnime'
 				},
 				{
+					eventType: 'animationcancel',
+					iterationName: 'enterAnimeIterating',
+					name: 'enterAnimeCanceled',
+					value: 'enter-anime-canceled',
+					valueName: 'enterAnime'
+				},
+				{
+					eventType: 'animationend',
+					iterationName: 'enterAnimeIterating',
+					name: 'enterAnimeEnded',
+					value: 'enter-anime-ended',
+					valueName: 'enterAnime'
+				},
+				
+				{
 					eventType: 'animationstart',
+					iterationName: 'initiateAnimeIterating',
+					name: 'initiateAnimeBegun',
+					value: 'initiate-anime-begun',
+					valueName: 'initiateAnime'
+				},
+				{
+					eventType: 'animationcancel',
+					iterationName: 'initiateAnimeIterating',
+					name: 'initiated',
+					value: 'initiated',
+					valueName: 'initiateAnime'
+				},
+				{
+					eventType: 'animationend',
+					iterationName: 'initiateAnimeIterating',
+					name: 'initiated',
+					value: 'initiated',
+					valueName: 'initiateAnime'
+				},
+				
+				{
+					eventType: 'animationstart',
+					iterationName: 'leaveAnimeIterating',
 					name: 'leaveAnimeBegun',
 					value: 'leave-anime-begun',
 					valueName: 'leaveAnime'
 				},
 				{
+					eventType: 'animationcancel',
+					iterationName: 'leaveAnimeIterating',
+					name: 'leaveAnimeCanceled',
+					value: 'leave-anime-canceled',
+					valueName: 'leaveAnime'
+				},
+				{
+					eventType: 'animationend',
+					iterationName: 'leaveAnimeIterating',
+					name: 'leaveAnimeEnded',
+					value: 'leave-anime-ended',
+					valueName: 'leaveAnime'
+				},
+				
+				{
 					eventType: 'animationstart',
+					iterationName: 'pressAnimeIterating',
 					name: 'pressAnimeBegun',
 					value: 'press-anime-begun',
 					valueName: 'pressAnime'
 				},
 				{
+					eventType: 'animationcancel',
+					iterationName: 'pressAnimeIterating',
+					name: 'pressAnimeCanceled',
+					value: 'press-anime-canceled',
+					valueName: 'pressAnime'
+				},
+				{
+					eventType: 'animationend',
+					iterationName: 'pressAnimeIterating',
+					name: 'pressAnimeEnded',
+					value: 'press-anime-ended',
+					valueName: 'pressAnime'
+				},
+				
+				{
 					eventType: 'animationstart',
+					iterationName: 'releaseAnimeIterating',
 					name: 'releaseAnimeBegun',
 					value: 'release-anime-begun',
 					valueName: 'releaseAnime'
 				},
 				{
-					eventType: 'animationend',
-					name: 'enterAnimeEnded',
-					value: 'enter-anime-ended',
-					valueName: 'enterAnime'
+					eventType: 'animationcancel',
+					iterationName: 'releaseAnimeIterating',
+					name: 'releaseAnimeCanceled',
+					value: 'release-anime-canceled',
+					valueName: 'releaseAnime'
 				},
 				{
 					eventType: 'animationend',
-					name: 'leaveAnimeEnded',
-					value: 'leave-anime-ended',
-					valueName: 'leaveAnime'
-				},
-				{
-					eventType: 'animationend',
-					name: 'pressAnimeEnded',
-					value: 'press-anime-ended',
-					valueName: 'pressAnime'
-				},
-				{
-					eventType: 'animationend',
+					iterationName: 'releaseAnimeIterating',
 					name: 'releaseAnimeEnded',
 					value: 'release-anime-ended',
 					valueName: 'releaseAnime'
 				}
+				
 			],
 			interactions: [
 				{ eventType: 'mouseenter', name: 'entered', resetName: 'entered', value: 'enter' },
@@ -970,11 +1074,20 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 							{
 								attr:	[
 											{ name: 'enter-anime-begun', method: 'toggle', value: false },
+											{ name: 'enter-anime-iterating', method: 'toggle', value: false },
+											{ name: 'enter-anime-canceled', method: 'toggle', value: false },
 											{ name: 'enter-anime-ended', method: 'toggle', value: false },
+											{ name: 'enter-interrupted', method: 'toggle', value: false },
 											{ name: 'entered', method: 'toggle', value: false },
+											{ name: 'interrupted-enter-anime', method: 'toggle', value: false },
+											{ name: 'interrupted-leave-anime', method: 'toggle', value: false },
 											{ name: 'leave-anime-begun', method: 'toggle', value: false },
+											{ name: 'leave-anime-iterating', method: 'toggle', value: false },
+											{ name: 'leave-anime-canceled', method: 'toggle', value: false },
 											{ name: 'leave-anime-ended', method: 'toggle', value: false },
-											{ name: 'left', method: 'toggle', value: false }
+											{ name: 'leave-interrupted', method: 'toggle', value: false },
+											{ name: 'left', method: 'toggle', value: false },
+											{ name: 'out-of-bound', method: 'toggle', value: false }
 										]
 							},
 							{ attr: [ { name: 'entered', method: 'toggle', value: true } ] }
@@ -983,8 +1096,12 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 							{
 								attr:	[
 											{ name: 'entered', method: 'toggle', value: false },
+											{ name: 'interrupted-leave-anime', method: 'toggle', value: false },
 											{ name: 'leave-anime-begun', method: 'toggle', value: false },
+											{ name: 'leave-anime-iterating', method: 'toggle', value: false },
+											{ name: 'leave-anime-canceled', method: 'toggle', value: false },
 											{ name: 'leave-anime-ended', method: 'toggle', value: false },
+											{ name: 'leave-interrupted', method: 'toggle', value: false },
 											{ name: 'left', method: 'toggle', value: false }
 										]
 							},
@@ -995,12 +1112,22 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			pressed:	[
 							{
 								attr:	[
+											{ name: 'interrupted-press-anime', method: 'toggle', value: false },
+											{ name: 'interrupted-release-anime', method: 'toggle', value: false },
 											{ name: 'press-anime-begun', method: 'toggle', value: false },
+											{ name: 'press-anime-iterating', method: 'toggle', value: false },
+											{ name: 'press-anime-canceled', method: 'toggle', value: false },
 											{ name: 'press-anime-ended', method: 'toggle', value: false },
+											{ name: 'press-interrupted', method: 'toggle', value: false },
 											{ name: 'pressed', method: 'toggle', value: false },
 											{ name: 'release-anime-begun', method: 'toggle', value: false },
+											{ name: 'release-anime-iterating', method: 'toggle', value: false },
+											{ name: 'release-anime-canceled', method: 'toggle', value: false },
 											{ name: 'release-anime-ended', method: 'toggle', value: false },
-											{ name: 'released', method: 'toggle', value: false }
+											{ name: 'release-canceled', method: 'toggle', value: false },
+											{ name: 'release-interrupted', method: 'toggle', value: false },
+											{ name: 'released', method: 'toggle', value: false },
+											{ name: 'out-of-bound', method: 'toggle', value: false }
 										]
 							},
 							{ attr: [ { name: 'pressed', method: 'toggle', value: true } ] }
@@ -1008,73 +1135,181 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			released:	[
 							{
 								attr:	[
+											{ name: 'interrupted-release-anime', method: 'toggle', value: false },
 											{ name: 'pressed', method: 'toggle', value: false },
 											{ name: 'release-anime-begun', method: 'toggle', value: false },
+											{ name: 'release-anime-iterating', method: 'toggle', value: false },
+											{ name: 'release-anime-canceled', method: 'toggle', value: false },
 											{ name: 'release-anime-ended', method: 'toggle', value: false },
+											{ name: 'release-canceled', method: 'toggle', value: false },
+											{ name: 'release-interrupted', method: 'toggle', value: false },
 											{ name: 'released', method: 'toggle', value: false },
+											{ name: 'out-of-bound', method: 'toggle', value: false }
 										]
 							},
 							{ attr: [ { name: 'released', method: 'toggle', value: true } ] }
-						]
+						],
+			releaseCanceled:	[
+									{
+										attr:	[
+													{ name: 'pressed', method: 'toggle', value: false },
+													{ name: 'released', method: 'toggle', value: false },
+													{ name: 'out-of-bound', method: 'toggle', value: false }
+												]
+									},
+									{ attr: [ { name: 'release-canceled', method: 'toggle', value: true } ] }
+								]
+		},
+		
+		this.context = {
+			handler: {
+				toggle: {
+					get(attributeName) { return function () { return this.element.hasAttribute(attributeName) }; },
+					set(attributeName) { return function (v) { this.element.toggleAttribute(attributeName, !!v) }; }
+				},
+				['value-string']: {
+					get(attributeName) { return function () { return this.element.getAttribute(attributeName) }; },
+					set(attributeName) { return function (v) { this.element.setAttribute(attributeName, v) }; }
+				}
+			},
+			property: {
+				'[]Anime': { handlerType: 'value-string', attributeName: '[]-anime' },
+				'[]AnimeBegun': { handlerType: 'toggle', attributeName: '[]-anime-begun' },
+				'[]AnimeCanceled': { handlerType: 'toggle', attributeName: '[]-anime-canceled' },
+				'[]AnimeEnded': { handlerType: 'toggle', attributeName: '[]-anime-ended' },
+				'[]AnimeIterating': { handlerType: 'toggle', attributeName: '[]-anime-iterating' },
+				'[]Interrupted': { handlerType: 'toggle', attributeName: '[]-interrupted' },
+				'[past]': { handlerType: 'toggle', attributeName: '[past]' },
+				'interrupted[capitalized]Anime': { handlerType: 'toggle', attributeName: 'interrupted-[]-anime' }
+			},
+			rx: {
+				name: /\[\]/g,
+				capitalized: /\[capitalized\]/g,
+				capitalizedPast: /\[capitalizedPast\]/g,
+				past: /\[past\]/g
+			},
+			type: {
+				enter: {
+					capitalized: 'Enter',
+					capitalizedPast: 'Entered',
+					past: 'entered'
+				},
+				initiate: {
+					capitalized: 'Initiate',
+					capitalizedPast: 'Initiated',
+					past: 'initiated',
+					property: {
+						'[]AnimeEnded': false
+					}
+				},
+				leave: {
+					capitalized: 'Leave',
+					capitalizedPast: 'Left',
+					past: 'left'
+				},
+				press: {
+					capitalized: 'Press',
+					capitalizedPast: 'Pressed',
+					past: 'pressed'
+				},
+				release: {
+					capitalized: 'Release',
+					capitalizedPast: 'Released',
+					past: 'released'
+				}
+			}
 		};
+		
+		const { context: { handler, property, rx, type}, prototype } = this, contextPropertyDefinition = {};
+		let k,v,k0,v0,k1,v1,v2, propertyName,attributeName;
+		
+		for (k in type) {
+			
+			v = type[k];
+			
+			for (k0 in property) {
+				
+				if (v.property?.[k0] !== false) {
+					
+					propertyName = k0, attributeName = (v0 = property[k0]).attributeName;
+					
+					for (k1 in  rx)	propertyName = propertyName.replace(v1 = rx[k1], v2 = v[k1] ?? k),
+									attributeName = attributeName.replace(v1, v2);
+					
+					contextPropertyDefinition[propertyName] = {
+						get: (v1 = handler[v0.handlerType])?.get?.(attributeName),
+						set: v1?.set?.(attributeName)
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		//hi(contextPropertyDefinition);
+		
+		Object.defineProperties(prototype, contextPropertyDefinition);
+		
+		this.mouseupAfterOutOfBoundOption = { once: true };
 		
 	}
 	
-	//static endedAnime(event, ...elements) {
-	//	
-	//	const { purgeAfterAnime, enterAnime, leaveAnime, pressAnime, releaseAnime, sbcvAfterAnime } = this;
-	//	
-	//	switch (event.animationName) {
-	//		
-	//		case enterAnime:
-	//		this.enterAnimeEnded = true, state = 'enter';
-	//		break;
-	//		
-	//		case leaveAnime:
-	//		this.leaveAnimeEnded = true, state = 'leave';
-	//		break;
-	//		
-	//		case pressAnime:
-	//		this.pressAnimeEnded = true, state = 'press';
-	//		break;
-	//		
-	//		case releaseAnime:
-	//		this.releaseAnimeEnded = true, state = 'release';
-	//		break;
-	//		
-	//	}
-	//	
-	//	sbcvAfterAnime === true || sbcvAfterAnime.includes('ended-' + state) ?
-	//		ShadowInteractiveElement.setBoundToCSSVar(...elements) :
-	//		this.setBoundToCSSVarAfter({ event }, this.element, ...elements),
-	//	
-	//	purgeAfterAnime === true || purgeAfterAnime.includes('ended-' + state) ?
-	//		this.purge(undefined, true) : this.purgeAfter({ event });
-	//	
-	//}
-	
+	static mouseupAfterOutOfBound(event) {
+		
+		const { constructor: { reset: { releaseCanceled } }, element } = this;
+		
+		return event.composedPath().includes(element) || this.resetAnime(...releaseCanceled);
+		
+	}
 	static interacted(event, ...elements) {
 		
-		const { type } = event, { constructor: { state: { interactions } } } = this, { length } = interactions;
-		let i,v;
+		const	{ type: eventType } = event,
+				{ constructor } = this,
+				{ context: { type }, state: { interactions } } = constructor,
+				{ length } = interactions;
+		let i, v;
 		
 		i = -1;
-		while (++i < length && (v = interactions[i]).eventType !== type);
+		while (++i < length && (v = interactions[i]).eventType !== eventType);
 		
 		if (i !== length) {
 			
-			//this.resetAnime(...reset[v.resetName]);
-			//
-			//const requirements = this.getCurrentStateAsRequirements(true);
-			//
-			//this.setBoundToCSSVarAfter({ event }, requirements, this.element, ...elements),
-			//this.purgeAfter({ event }, requirements);
+			const	{ mouseupAfterOutOfBoundOption, reset } = constructor,
+					{ element, mouseupAfterOutOfBound, purgeAfterInteractions, sbcvAfterInteractions } = this,
+					{ resetName, value } = v,
+					interrupted = [];
+			let i0, k, v0, requirements;
 			
-			const	{ constructor: { reset }, element, purgeAfterInteractions, sbcvAfterInteractions } = this,
-					{ resetName, value } = v;
-			let requirements;
+			i = i0 = -1;
+			while (++i < length)	(v0 = interactions[i].value) !== value && this[v0 + 'AnimeIterating'] &&
+										(interrupted[++i0] = v0);
 			
-			this.resetAnime(...reset[resetName]),
+			this.resetAnime(...reset[resetName]);
+			
+			i = -1, ++i0;
+			while (++i < i0)	this['interrupted' + type[interrupted[i]].capitalized + 'Anime'] = true,
+								this[value + 'Interrupted'] = true;
+			
+			//coco CSS含め。outOfBound後にmouseenterしてmouseupした時に専用のイベントを発生させる必要があるかもしれない。
+			//coco インタラクション中に他のインタラクションのアニメが再生中であれば、インタラクション中に紐付けられたアニメの再生の可否をコントロールするための
+			// can-cancel-leave-anime 的な属性を設定する。仕組み的には *-anime-iterating を通じて他のインタラクションのアニメの再生を確認する。
+			// それに加え割り込んだアニメの状態を示す interrupted-*-anime
+			// coco can-cancel-*-anime は interrupted-*-anime に変更。それらの新しく設定した属性値を CSS に反映して挙動の修正。
+			switch (eventType) {
+				
+				case 'mouseenter':
+				this.outOfBound &&= false;
+				break;
+				
+				case 'mouseleave':
+				const { pressed, released } = this;
+				//this.outOfBound = pressed && !released;
+				(this.outOfBound = pressed && !released) &&
+					addEventListener('mouseup', mouseupAfterOutOfBound, mouseupAfterOutOfBoundOption);
+				break;
+				
+			}
 			
 			sbcvAfterInteractions?.includes?.(value) &&
 				this.setBoundToCSSVarAfter	(
@@ -1090,58 +1325,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		}
 		
 	}
-	//static entered(event) {
-	//	
-	//	const { purgeAfterInteractions, sbcvAfterInteractions } = this;
-	//	
-	//	this.resetAnime(...this.constructor.reset.entered),
-	//	
-	//	sbcvAfterInteractions === true || sbcvAfterInteractions?.includes?.('enter') ?
-	//		ShadowInteractiveElement.setBoundToCSSVar(undefined, true) : this.setBoundToCSSVarAfter({ event }),
-	//	
-	//	purgeAfterInteractions === true || purgeAfterInteractions?.includes?.('enter') ?
-	//		this.purge(undefined, true) : this.purgeAfter({ event });
-	//	
-	//}
-	//static left(event) {
-	//	
-	//	const { purgeAfterInteractions, sbcvAfterInteractions } = this;
-	//	
-	//	this.resetAnime(...this.constructor.reset.left),
-	//	
-	//	sbcvAfterInteractions === true || sbcvAfterInteractions?.includes?.('leave') ?
-	//		ShadowInteractiveElement.setBoundToCSSVar(undefined, true) : this.setBoundToCSSVarAfter({ event }),
-	//	
-	//	purgeAfterInteractions === true || purgeAfterInteractions?.includes?.('leave') ?
-	//		this.purge(undefined, true) : this.purgeAfter({ event });
-	//	
-	//}
-	//static pressed(event) {
-	//	
-	//	const { purgeAfterInteractions, sbcvAfterInteractions } = this;
-	//	
-	//	this.resetAnime(...this.constructor.reset.pressed),
-	//	
-	//	sbcvAfterInteractions === true || sbcvAfterInteractions?.includes?.('press') ?
-	//		ShadowInteractiveElement.setBoundToCSSVar(undefined, true) : this.setBoundToCSSVarAfter({ event }),
-	//	
-	//	purgeAfterInteractions === true || purgeAfterInteractions?.includes?.('press') ?
-	//		this.purge(undefined, true) : this.purgeAfter({ event });
-	//	
-	//}
-	//static released(event) {
-	//	
-	//	const { purgeAfterInteractions, sbcvAfterInteractions } = this;
-	//	
-	//	this.resetAnime(...this.constructor.reset.released),
-	//	
-	//	sbcvAfterInteractions === true || sbcvAfterInteractions?.includes?.('release') ?
-	//		ShadowInteractiveElement.setBoundToCSSVar(undefined, true) : this.setBoundToCSSVarAfter({ event }),
-	//	
-	//	purgeAfterInteractions === true || purgeAfterInteractions?.includes?.('release') ?
-	//		this.purge(undefined, true) : this.purgeAfter({ event });
-	//	
-	//}
 	
 	static changedAnimationState(event, ...elements) {
 		
@@ -1150,14 +1333,17 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		
 		i = -1;
 		while (++i < length && ((v = anime[i]).eventType !== type || (this[v.valueName]) !== animationName));
-		
+		//hi(i,length, type, animationName, this.element);
 		if (i !== length) {
 			
-			const { element, purgeAfterAnime, sbcvAfterAnime } = this, { name, value } = v;
+			const { element, purgeAfterAnime, sbcvAfterAnime } = this, { iterationName, name, value } = v;
 			let requirements;
 			
 			this[name] = true,
 			
+			this[iterationName] = type === 'animationstart' || type === 'animationiteration',
+			//hi(iterationName,this[iterationName],type);
+			//hi(animationName, type, iterationName,this[iterationName],name,this[name],this.element);
 			sbcvAfterAnime?.includes?.(value) &&
 				this.setBoundToCSSVarAfter	(
 												{ event },
@@ -1170,34 +1356,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			
 		}
 		
-		//switch (event.animationName) {
-		//	
-		//	case enterAnime:
-		//	this.enterAnimeBegun = true;
-		//	break;
-		//	
-		//	case leaveAnime:
-		//	this.leaveAnimeBegun = true;
-		//	break;
-		//	
-		//	case pressAnime:
-		//	this.pressAnimeBegun = true;
-		//	break;
-		//	
-		//	case releaseAnime:
-		//	this.releaseAnimeBegun = true;
-		//	break;
-		//	
-		//	default:
-		//	return;
-		//	
-		//}
-		//
-		//const requirements = this.getCurrentStateAsRequirements(true);
-		//
-		//this.setBoundToCSSVarAfter({ event }, requirements, this.element, ...elements),
-		//this.purgeAfter({ event }, requirements);
-		
 	}
 	
 	constructor() {
@@ -1208,6 +1366,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 					constructor:	{
 										changedAnimationState,
 										interacted,
+										mouseupAfterOutOfBound,
 										requirementsForPurgeAfter,
 										requirementsForSBCVA
 									}
@@ -1217,7 +1376,10 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		requirementsForPurgeAfter && (this.requirementsForPurgeAfter = requirementsForPurgeAfter),
 		requirementsForSBCVA && (this.requirementsForSBCVA = requirementsForSBCVA),
 		
+		this.mouseupAfterOutOfBound = mouseupAfterOutOfBound.bind(this),
+		
 		this.addLifetimeEvent('animationstart', handler = this.changedAnimationState = changedAnimationState.bind(this)),
+		this.addLifetimeEvent('animationcancel', handler),
 		this.addLifetimeEvent('animationend', handler),
 		
 		this.addLifetimeEvent('mouseenter', handler = this.interacted = interacted.bind(this)),
@@ -1271,58 +1433,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 				
 			}
 			
-			//anime &&
-			//	(
-			//		isArray(anime) ?
-			//			(
-			//				i0 = -1, isBegun = isEnded = false,
-			//				(
-			//					(enterAnimeBegun && anime.includes('begun-enter') && (isBegun = true)) ||
-			//					(enterAnimeEnded && anime.includes('ended-enter') && (isEnded = true))
-			//				) && (animationName[++i0] = enterAnime),
-			//				(
-			//					(leaveAnimeBegun && anime.includes('begun-leave') && (isBegun = true)) ||
-			//					(leaveAnimeEnded && anime.includes('ended-leave') && (isEnded = true))
-			//				) && (animationName[++i0] = leaveAnime),
-			//				(
-			//					(pressAnimeBegun && anime.includes('begun-press') && (isBegun = true)) ||
-			//					(pressAnimeEnded && anime.includes('ended-press') && (isEnded = true))
-			//				) && (animationName[++i0] = pressAnime),
-			//				(
-			//					(releaseAnimeBegun && anime.includes('begun-release') && (isBegun = true)) ||
-			//					(releaseAnimeEnded && anime.includes('ended-release') && (isEnded = true))
-			//				) && (animationName[++i0] = releaseAnime),
-			//				
-			//				i0 = -1,
-			//				isBegun && (type[++i0] = 'animationstart'),
-			//				isEnded && (type[++i0] = 'animationend')
-			//			) :
-			//			(
-			//				i0 = -1,
-			//				animationName[++i0] = enterAnime,
-			//				animationName[++i0] = leaveAnime,
-			//				animationName[++i0] = pressAnime,
-			//				animationName[++i0] = releaseAnime,
-			//				
-			//				i0 = -1,
-			//				type[++i0] = 'animationstart',
-			//				type[++i0] = 'animationend'
-			//			)
-			//	),
-			//
-			//interactions &&
-			//	(
-			//		i0 = -1,
-			//		((allowsAll = isArray(interactions)) || (isEntered && interactions.includes('enter'))) &&
-			//			(type[++i0] = 'mouseenter'),
-			//		(allowsAll || (isLeft && interactions.includes('leave'))) &&
-			//			(type[++i0] = 'mouseleave'),
-			//		(allowsAll || (isPressed && interactions.includes('press'))) &&
-			//			(type[++i0] = 'mousedown'),
-			//		(allowsAll || (isReleased && interactions.includes('release'))) &&
-			//			(type[++i0] = 'mouseup')
-			//	);
-			
 		}
 		
 		if (merges) {
@@ -1346,115 +1456,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		return requirements;
 		
 	}
-	//purgeWithAnimeState(source, preserves, removeOnce = true) {
-	//	
-	//	const { purgeAfterAnime } = this;
-	//	
-	//	if (purgeAfterAnime) {
-	//		
-	//		const { enterAnime, leaveAnime, pressAnime, releaseAnime } = this;
-	//		let animationName, type;
-	//		
-	//		if (Array.isArray(purgeAfterAnime)) {
-	//			
-	//			const	{
-	//						enterAnimeBegun, enterAnimeEnded,
-	//						leaveAnimeBegun, leaveAnimeEnded,
-	//						pressAnimeBegun, pressAnimeEnded,
-	//						releaseAnimeBegun, releaseAnimeEnded
-	//					} = this;
-	//			let i, isBegun,isEnded;
-	//			
-	//			i = -1,
-	//			animationName = [],
-	//			type = [],
-	//			(
-	//				(enterAnimeBegun && purgeAfterAnime.includes('begun-enter') && (isBegun = true)) ||
-	//				(enterAnimeEnded && purgeAfterAnime.includes('ended-enter') && (isEnded = true))
-	//			) && (animationName[++i] = enterAnime),
-	//			(
-	//				(leaveAnimeBegun && purgeAfterAnime.includes('begun-leave') && (isBegun = true)) ||
-	//				(leaveAnimeEnded && purgeAfterAnime.includes('ended-leave') && (isEnded = true))
-	//			) && (animationName[++i] = leaveAnime),
-	//			(
-	//				(pressAnimeBegun && purgeAfterAnime.includes('begun-press') && (isBegun = true)) ||
-	//				(pressAnimeEnded && purgeAfterAnime.includes('ended-press') && (isEnded = true))
-	//			) && (animationName[++i] = pressAnime),
-	//			(
-	//				(releaseAnimeBegun && purgeAfterAnime.includes('begun-release') && (isBegun = true)) ||
-	//				(releaseAnimeEnded && purgeAfterAnime.includes('ended-release') && (isEnded = true))
-	//			) && (animationName[++i] = releaseAnime);
-	//			
-	//		} else {
-	//			
-	//			type = [ 'animationstart', 'animationend' ],
-	//			animationName = [ enterAnime, leaveAnime, pressAnime, releaseAnime ];
-	//			
-	//		}
-	//		
-	//		if (this.require(source, { event: { type, animationName } }))
-	//			return !(void this.purge(preserves, removeOnce));
-	//		
-	//	}
-	//	
-	//	return this.purgeAfter(preserves, removeOnce);
-	//	
-	//}
-	
-	//purgeWithAnimeState(source, preserves, removeOnce = true) {
-	//	
-	//	const { purgeAfterAnime } = this;
-	//	
-	//	if (purgeAfterAnime) {
-	//		
-	//		const { enterAnime, leaveAnime, pressAnime, releaseAnime } = this;
-	//		let animationName, type;
-	//		
-	//		if (Array.isArray(purgeAfterAnime)) {
-	//			
-	//			const	{
-	//						enterAnimeBegun, enterAnimeEnded,
-	//						leaveAnimeBegun, leaveAnimeEnded,
-	//						pressAnimeBegun, pressAnimeEnded,
-	//						releaseAnimeBegun, releaseAnimeEnded
-	//					} = this;
-	//			let i, isBegun,isEnded;
-	//			
-	//			i = -1,
-	//			animationName = [],
-	//			type = [],
-	//			(
-	//				(enterAnimeBegun && purgeAfterAnime.includes('begun-enter') && (isBegun = true)) ||
-	//				(enterAnimeEnded && purgeAfterAnime.includes('ended-enter') && (isEnded = true))
-	//			) && (animationName[++i] = enterAnime),
-	//			(
-	//				(leaveAnimeBegun && purgeAfterAnime.includes('begun-leave') && (isBegun = true)) ||
-	//				(leaveAnimeEnded && purgeAfterAnime.includes('ended-leave') && (isEnded = true))
-	//			) && (animationName[++i] = leaveAnime),
-	//			(
-	//				(pressAnimeBegun && purgeAfterAnime.includes('begun-press') && (isBegun = true)) ||
-	//				(pressAnimeEnded && purgeAfterAnime.includes('ended-press') && (isEnded = true))
-	//			) && (animationName[++i] = pressAnime),
-	//			(
-	//				(releaseAnimeBegun && purgeAfterAnime.includes('begun-release') && (isBegun = true)) ||
-	//				(releaseAnimeEnded && purgeAfterAnime.includes('ended-release') && (isEnded = true))
-	//			) && (animationName[++i] = releaseAnime);
-	//			
-	//		} else {
-	//			
-	//			type = [ 'animationstart', 'animationend' ],
-	//			animationName = [ enterAnime, leaveAnime, pressAnime, releaseAnime ];
-	//			
-	//		}
-	//		
-	//		if (this.require(source, { event: { type, animationName } }))
-	//			return !(void this.purge(preserves, removeOnce));
-	//		
-	//	}
-	//	
-	//	return this.purgeAfter(preserves, removeOnce);
-	//	
-	//}
 	
 	purgeAfter(source, requirements = this.requirementsForPurgeAfter, preserves, removeOnce = true) {
 		
@@ -1463,7 +1464,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 	}
 	
 	require(source, requirements, defaultValue) {
-		hi(requirements);
+		
 		if (requirements && typeof requirements === 'object') {
 			
 			const	{ flatten, requireAny } = ShadowInteractiveElement,
@@ -1496,136 +1497,296 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		
 	}
 	
-	get enterAnime() {
+	//get enterAnime() {
+	//	
+	//	return this.element.getAttribute('enter-anime');
+	//	
+	//}
+	//set enterAnime(v) {
+	//	
+	//	this.element.setAttribute('enter-anime', v);
+	//	
+	//}
+	//get enterAnimeBegun() {
+	//	
+	//	return this.element.hasAttribute('enter-anime-begun');
+	//	
+	//}
+	//set enterAnimeBegun(v) {
+	//	
+	//	this.element.toggleAttribute('enter-anime-begun', !!v);
+	//	
+	//}
+	//get enterAnimeCanceled() {
+	//	
+	//	return this.element.hasAttribute('enter-anime-canceled');
+	//	
+	//}
+	//set enterAnimeCanceled(v) {
+	//	
+	//	this.element.toggleAttribute('enter-anime-canceled', !!v);
+	//	
+	//}
+	//get enterAnimeEnded() {
+	//	
+	//	return this.element.hasAttribute('enter-anime-ended');
+	//	
+	//}
+	//set enterAnimeEnded(v) {
+	//	
+	//	this.element.toggleAttribute('enter-anime-ended', !!v);
+	//	
+	//}
+	//get enterAnimeIterating() {
+	//	
+	//	return this.element.hasAttribute('enter-anime-iterating');
+	//	
+	//}
+	//set enterAnimeIterating(v) {
+	//	
+	//	this.element.toggleAttribute('enter-anime-iterating', !!v);
+	//	
+	//}
+	//get entered() {
+	//	
+	//	return this.element.hasAttribute('entered');
+	//	
+	//}
+	//set entered(v) {
+	//	
+	//	this.element.toggleAttribute('entered', !!v);
+	//	
+	//}
+	//get enterInterrupted() {
+	//	
+	//	return this.element.hasAttribute('enter-interrupted');
+	//	
+	//}
+	//set enterInterrupted(v) {
+	//	
+	//	this.element.toggleAttribute('enter-interrupted', !!v);
+	//	
+	//}
+	//get initiateAnime() {
+	//	
+	//	return this.element.getAttribute('initiate-anime');
+	//	
+	//}
+	//set initiateAnime(v) {
+	//	
+	//	this.element.setAttribute('initiate-anime', v);
+	//	
+	//}
+	//get initiateAnimeBegun() {
+	//	
+	//	return this.element.hasAttribute('initiate-anime-begun');
+	//	
+	//}
+	//set initiateAnimeBegun(v) {
+	//	
+	//	this.element.toggleAttribute('initiate-anime-begun', !!v);
+	//	
+	//}
+	//get initiateAnimeIterating() {
+	//	
+	//	return this.element.hasAttribute('initiate-anime-iterating');
+	//	
+	//}
+	//set initiateAnimeIterating(v) {
+	//	
+	//	this.element.toggleAttribute('initiate-anime-iterating', !!v);
+	//	
+	//}
+	//get initiated() {
+	//	
+	//	return this.element.hasAttribute('initiated');
+	//	
+	//}
+	//set initiated(v) {
+	//	
+	//	this.element.toggleAttribute('initiated', !!v);
+	//	
+	//}
+	//get interruptedEnterAnime() {
+	//	
+	//	return this.element.hasAttribute('interrupted-enter-anime');
+	//	
+	//}
+	//set interruptedEnterAnime(v) {
+	//	
+	//	this.element.toggleAttribute('interrupted-enter-anime', !!v);
+	//	
+	//}
+	//get interruptedInitiateAnime() {
+	//	
+	//	return this.element.hasAttribute('interrupted-initiate-anime');
+	//	
+	//}
+	//set interruptedInitiateAnime(v) {
+	//	
+	//	this.element.toggleAttribute('interrupted-initiate-anime', !!v);
+	//	
+	//}
+	//get interruptedLeaveAnime() {
+	//	
+	//	return this.element.hasAttribute('interruptedLeaveAnime');
+	//	
+	//}
+	//set interruptedLeaveAnime(v) {
+	//	
+	//	this.element.toggleAttribute('interruptedLeaveAnime', !!v);
+	//	
+	//}
+	//get interruptedPressAnime() {
+	//	
+	//	return this.element.hasAttribute('interrupted-press-anime');
+	//	
+	//}
+	//set interruptedPressAnime(v) {
+	//	
+	//	this.element.toggleAttribute('interrupted-press-anime', !!v);
+	//	
+	//}
+	//get interruptedReleaseAnime() {
+	//	
+	//	return this.element.hasAttribute('interrupted-release-anime');
+	//	
+	//}
+	//set interruptedReleaseAnime(v) {
+	//	
+	//	this.element.toggleAttribute('interrupted-release-anime', !!v);
+	//	
+	//}
+	//get leaveAnime() {
+	//	
+	//	return this.element.getAttribute('leave-anime');
+	//	
+	//}
+	//set leaveAnime(v) {
+	//	
+	//	this.element.setAttribute('leave-anime', v);
+	//	
+	//}
+	//get leaveAnimeBegun() {
+	//	
+	//	return this.element.hasAttribute('leave-anime-begun');
+	//	
+	//}
+	//set leaveAnimeBegun(v) {
+	//	
+	//	this.element.toggleAttribute('leave-anime-begun', !!v);
+	//	
+	//}
+	//get leaveAnimeCanceled() {
+	//	
+	//	return this.element.hasAttribute('leave-anime-canceled');
+	//	
+	//}
+	//set leaveAnimeCanceled(v) {
+	//	
+	//	this.element.toggleAttribute('leave-anime-canceled', !!v);
+	//	
+	//}
+	//get leaveAnimeEnded() {
+	//	
+	//	return this.element.hasAttribute('leave-anime-ended');
+	//	
+	//}
+	//set leaveAnimeEnded(v) {
+	//	
+	//	this.element.toggleAttribute('leave-anime-ended', !!v);
+	//	
+	//}
+	//get leaveAnimeIterating() {
+	//	
+	//	return this.element.hasAttribute('leave-anime-iterating');
+	//	
+	//}
+	//set leaveAnimeIterating(v) {
+	//	
+	//	this.element.toggleAttribute('leave-anime-iterating', !!v);
+	//	
+	//}
+	//get left() {
+	//	
+	//	return this.element.hasAttribute('left');
+	//	
+	//}
+	//set left(v) {
+	//	
+	//	this.element.toggleAttribute('left', !!v);
+	//	
+	//}
+	get outOfBound() {
 		
-		return this.element.getAttribute('enter-anime');
+		return this.element.hasAttribute('out-of-bound');
 		
 	}
-	set enterAnime(v) {
+	set outOfBound(v) {
 		
-		this.element.setAttribute('enter-anime', v);
-		
-	}
-	get enterAnimeBegun() {
-		
-		return this.element.hasAttribute('enter-anime-begun');
+		this.element.toggleAttribute('out-of-bound', !!v);
 		
 	}
-	set enterAnimeBegun(v) {
-		
-		this.element.toggleAttribute('enter-anime-begun', !!v);
-		
-	}
-	get enterAnimeEnded() {
-		
-		return this.element.hasAttribute('enter-anime-ended');
-		
-	}
-	set enterAnimeEnded(v) {
-		
-		this.element.toggleAttribute('enter-anime-ended', !!v);
-		
-	}
-	get entered() {
-		
-		return this.element.hasAttribute('entered');
-		
-	}
-	set entered(v) {
-		
-		this.element.toggleAttribute('entered', !!v);
-		
-	}
-	get isLeft() {
-		
-		return this.element.hasAttribute('left');
-		
-	}
-	set left(v) {
-		
-		this.element.toggleAttribute('left', !!v);
-		
-	}
-	get pressed() {
-		
-		return this.element.hasAttribute('pressed');
-		
-	}
-	set pressed(v) {
-		
-		this.element.toggleAttribute('pressed', !!v);
-		
-	}
-	get released() {
-		
-		return this.element.hasAttribute('released');
-		
-	}
-	set released(v) {
-		
-		this.element.toggleAttribute('released', !!v);
-		
-	}
-	get leaveAnime() {
-		
-		return this.element.getAttribute('leave-anime');
-		
-	}
-	set leaveAnime(v) {
-		
-		this.element.setAttribute('leave-anime', v);
-		
-	}
-	get leaveAnimeBegun() {
-		
-		return this.element.hasAttribute('leave-anime-begun');
-		
-	}
-	set leaveAnimeBegun(v) {
-		
-		this.element.toggleAttribute('leave-anime-begun', !!v);
-		
-	}
-	get leaveAnimeEnded() {
-		
-		return this.element.hasAttribute('leave-anime-ended');
-		
-	}
-	set leaveAnimeEnded(v) {
-		
-		this.element.toggleAttribute('leave-anime-ended', !!v);
-		
-	}
-	get pressAnime() {
-		
-		return this.element.getAttribute('press-anime');
-		
-	}
-	set pressAnime(v) {
-		
-		this.element.setAttribute('press-anime', v);
-		
-	}
-	get pressAnimeBegun() {
-		
-		return this.element.hasAttribute('press-anime-begun');
-		
-	}
-	set pressAnimeBegun(v) {
-		
-		this.element.toggleAttribute('press-anime-begun', !!v);
-		
-	}
-	get pressAnimeEnded() {
-		
-		return this.element.hasAttribute('press-anime-ended');
-		
-	}
-	set pressAnimeEnded(v) {
-		
-		this.element.toggleAttribute('press-anime-ended', !!v);
-		
-	}
+	//get pressAnime() {
+	//	
+	//	return this.element.getAttribute('press-anime');
+	//	
+	//}
+	//set pressAnime(v) {
+	//	
+	//	this.element.setAttribute('press-anime', v);
+	//	
+	//}
+	//get pressAnimeBegun() {
+	//	
+	//	return this.element.hasAttribute('press-anime-begun');
+	//	
+	//}
+	//set pressAnimeBegun(v) {
+	//	
+	//	this.element.toggleAttribute('press-anime-begun', !!v);
+	//	
+	//}
+	//get pressAnimeCanceled() {
+	//	
+	//	return this.element.hasAttribute('press-anime-canceled');
+	//	
+	//}
+	//set pressAnimeCanceled(v) {
+	//	
+	//	this.element.toggleAttribute('press-anime-canceled', !!v);
+	//	
+	//}
+	//get pressAnimeEnded() {
+	//	
+	//	return this.element.hasAttribute('press-anime-ended');
+	//	
+	//}
+	//set pressAnimeEnded(v) {
+	//	
+	//	this.element.toggleAttribute('press-anime-ended', !!v);
+	//	
+	//}
+	//get pressAnimeIterating() {
+	//	
+	//	return this.element.hasAttribute('press-anime-iterating');
+	//	
+	//}
+	//set pressAnimeIterating(v) {
+	//	
+	//	this.element.toggleAttribute('press-anime-iterating', !!v);
+	//	
+	//}
+	//get pressed() {
+	//	
+	//	return this.element.hasAttribute('pressed');
+	//	
+	//}
+	//set pressed(v) {
+	//	
+	//	this.element.toggleAttribute('pressed', !!v);
+	//	
+	//}
 	get purgeAfterAnime() {
 		
 		const { element } = this;
@@ -1658,36 +1819,66 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			this.element.setAttribute('purge-after-interactions', Array.isArray(v) ? v.join(' ') : v);
 		
 	}
-	get releaseAnime() {
-		
-		return this.element.getAttribute('release-anime');
-		
-	}
-	set releaseAnime(v) {
-		
-		this.element.setAttribute('release-anime', v);
-		
-	}
-	get releaseAnimeBegun() {
-		
-		return this.element.hasAttribute('release-anime-begun');
-		
-	}
-	set releaseAnimeBegun(v) {
-		
-		this.element.toggleAttribute('release-anime-begun', !!v);
-		
-	}
-	get releaseAnimeEnded() {
-		
-		return this.element.hasAttribute('release-anime-ended');
-		
-	}
-	set releaseAnimeEnded(v) {
-		
-		this.element.toggleAttribute('release-anime-ended', !!v);
-		
-	}
+	//get releaseAnime() {
+	//	
+	//	return this.element.getAttribute('release-anime');
+	//	
+	//}
+	//set releaseAnime(v) {
+	//	
+	//	this.element.setAttribute('release-anime', v);
+	//	
+	//}
+	//get releaseAnimeBegun() {
+	//	
+	//	return this.element.hasAttribute('release-anime-begun');
+	//	
+	//}
+	//set releaseAnimeBegun(v) {
+	//	
+	//	this.element.toggleAttribute('release-anime-begun', !!v);
+	//	
+	//}
+	//get releaseAnimeCanceled() {
+	//	
+	//	return this.element.hasAttribute('release-anime-canceled');
+	//	
+	//}
+	//set releaseAnimeCanceled(v) {
+	//	
+	//	this.element.toggleAttribute('release-anime-canceled', !!v);
+	//	
+	//}
+	//get releaseAnimeEnded() {
+	//	
+	//	return this.element.hasAttribute('release-anime-ended');
+	//	
+	//}
+	//set releaseAnimeEnded(v) {
+	//	
+	//	this.element.toggleAttribute('release-anime-ended', !!v);
+	//	
+	//}
+	//get releaseAnimeIterating() {
+	//	
+	//	return this.element.hasAttribute('release-anime-iterating');
+	//	
+	//}
+	//set releaseAnimeIterating(v) {
+	//	
+	//	this.element.toggleAttribute('release-anime-iterating', !!v);
+	//	
+	//}
+	//get released() {
+	//	
+	//	return this.element.hasAttribute('released');
+	//	
+	//}
+	//set released(v) {
+	//	
+	//	this.element.toggleAttribute('released', !!v);
+	//	
+	//}
 	get requirementsForPurgeAfter() {
 		
 		return JSON.parse(this.element.getAttribute('purge-after'));

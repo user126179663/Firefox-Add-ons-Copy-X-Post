@@ -19,7 +19,7 @@
 	transform-origin: center bottom;
 	
 }
-:host(:not([data-cxp-left])) #buttons button .label:not([entered]) {
+:host(:not([data-cxp-left])) #buttons button:not([initiated]) .label {
 	
 	animation: spawn .3s ease-out 0s 1 normal forwards running;
 	
@@ -29,7 +29,7 @@
 	animation: exit .3s ease-out 0s 1 reverse forwards running !important;
 	
 }
-@keyframes spawn {
+/*@keyframes spawn {
 	0% {
 		opacity: .5;
 		scale: 100% 0%;
@@ -88,13 +88,18 @@
 	100% {
 		scale: 100% 100%;
 	}
-}
+}*/
 
 /*:host([data-cxp-entered]) #buttons button:hover .label,*/
-:host(:not([data-cxp-left])) #buttons button[entered] .label,
-:host(:not([data-cxp-left])) #buttons button[left] .label {
+:host(:not([data-cxp-left])) #buttons button[entered]:not([enter-anime-ended]):not([enter-anime-canceled]):not([pressed]) .label {
 	
-	animation: bounce .3s ease-out 0s 1 normal forwards running !important;
+	animation: bounce .3s ease-out 0s 1 normal forwards running;
+	
+}
+:host(:not([data-cxp-left])) #buttons button[left] .label,
+:host(:not([data-cxp-left])) #buttons button[left][out-of-bound] .label {
+	
+	animation: bounce-leave .3s ease-out 0s 1 normal forwards running;
 	
 }
 @keyframes bounce {
@@ -115,10 +120,68 @@
 		scale: 100% 100%;
 	}
 }
+@keyframes bounce-leave {
+	0% {
+		scale: 100% 100%;
+	}
+	33.3% {
+		opacity: 1;
+		scale: 130% 66.7%;
+	}
+	50% {
+		scale: 90% 120%;
+	}
+	75% {
+		scale: 110% 95%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+#buttons button[pressed]:not([out-of-bound]):not([interrupted-press-anime]) .label {
+	
+	animation: press .2s ease-in 0s 1 normal forwards running !important;
+	
+}
+@keyframes press {
+	
+	from {
+		
+		scale: 1;
+		
+	}
+	to {
+		
+		scale: .9;
+		
+	}
+	
+}
+#buttons button[released]:not([release-anime-ended]):not([interrupted-release-anime]) .label {
+	
+	/*animation: shake .3s cubic-bezier(.56,3.26,0,-1.37) 0s 1 normal forwards running !important;*/
+	animation: shake .2s cubic-bezier(.51,3.83,.72,-0.63) 0s 1 normal forwards running !important;
+	
+}
+@keyframes shake {
+	
+	0% {
+		
+		scale: 1.4;
+		
+	}
+	100% {
+		
+		scale: 1;
+		
+	}
+	
+}
 
+/*
 :host(:not([data-cxp-left])) #buttons button:active .label {
 	
-	animation: shake .3s ease-out 0s 1 normal forwards running !important;
+	--animation: shake .3s ease-out 0s 1 normal forwards running !important;
 	
 }
 @keyframes shake {
@@ -170,3 +233,4 @@
 	}
 	
 }
+*/

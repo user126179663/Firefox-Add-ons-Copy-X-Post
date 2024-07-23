@@ -1,0 +1,15 @@
+{
+	"extensionName": {
+		"message": "Copy 𝕏 Post",
+		"description": "Name of the extension."
+	},
+	"extensionDescription": {
+		"message": "Copy the text in the X Post to the clipboard.",
+		"description": "Description of the extension."
+	},
+	
+	"hintCopyButton": {
+		"message": "Copy Text",
+		"description": "A hint for copy button."
+	}
+}

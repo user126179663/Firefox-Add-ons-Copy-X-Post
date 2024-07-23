@@ -8,9 +8,22 @@
 	
 	"content_scripts": [
 		{
-			"css": [ "common.css", "default.css", "shadow-copy-x-post-hint.css", "shadow-copy-x-post-balloon.css" ],
-			"js": [ "utils.js", "shadow-element.js", "copy-x-post.js", "content_script.js" ],
-			"matches": [ "*://twitter.com/*", "*://x.com/*" ]
+			"css":	[
+						"css/common.css",
+						"css/default.css",
+						"css/shadow-copy-x-post-hint.css",
+						"css/shadow-copy-x-post-balloon.css"
+					],
+			"js":	[
+						"utils.js",
+						"shadow-element.js",
+						"copy-x-post.js",
+						"content_script.js"
+					],
+			"matches":	[
+							"*://twitter.com/*",
+							"*://x.com/*"
+						]
 		}
 	],
 	
@@ -18,10 +31,13 @@
 	
 	"description": "__MSG_extensionDescription__",
 	
-	"host_permissions": [ "*://twitter.com/*", "*://x.com/*" ],
+	"host_permissions":	[
+							"*://twitter.com/*",
+							"*://x.com/*"
+						],
 	
 	"icons": {
-		"48": "icon.svg"
+		"48": "images/icon.svg"
 	},
 	
 	"manifest_version": 3,
@@ -34,13 +50,16 @@
 	
 	"web_accessible_resources": [
 		{
-			"matches": [ "*://twitter.com/*", "*://x.com/*" ],
-			"resources": [
-				"common.css",
-				"shadow-copy-x-post-element.css",
-				"shadow-copy-x-post-element.html",
-				"shadow-copy-x-post-element-injected.css"
-			]
+			"matches":	[
+							"*://twitter.com/*",
+							"*://x.com/*"
+						],
+			"resources":	[
+								"css/common.css",
+								"css/shadow-copy-x-post-element.css",
+								"html/shadow-copy-x-post-element.html",
+								"css/shadow-copy-x-post-element-injected.css"
+							]
 		}
 	]
 	

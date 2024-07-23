@@ -1,0 +1,15 @@
+{
+	"extensionName": {
+		"message": "𝕏 のポストをコピー",
+		"description": "拡張機能の名前。"
+	},
+	"extensionDescription": {
+		"message": "X のポストをクリップボードへコピーします。",
+		"description": "拡張機能の説明。"
+	},
+	
+	"hintCopyButton": {
+		"message": "テキストをコピーする",
+		"description": "コピーボタンのヒント。"
+	}
+}

@@ -43,7 +43,7 @@ class CopyXPost {
 		shadowRoot.querySelector('#root').style.display = 'none',
 		node.appendChild(copyLabel).textContent = '📋',
 		(link = document.createElement('link')).rel = 'stylesheet',
-		shadowRoot.appendChild(link).href = browser.runtime.getURL('shadow-copy-x-post-element-injected.css');
+		shadowRoot.appendChild(link).href = browser.runtime.getURL('css/shadow-copy-x-post-element-injected.css');
 		
 		for (button of shadowRoot.querySelectorAll('#buttons button')) {
 			
@@ -261,7 +261,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 		this.SELECTOR_POST = CopyXPost.SELECTOR_POST,
 		
 		this.tag = 'cxp',
-		this.templateURL = 'shadow-copy-x-post-element.html';
+		this.templateURL = 'html/shadow-copy-x-post-element.html';
 		
 	}
 	

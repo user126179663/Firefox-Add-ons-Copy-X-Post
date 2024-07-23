@@ -1,8 +1,3 @@
-//todo
-//  ページ読み込み時に既にカーソルがenter状態の時の判定処理(無理？)
-//	mousedown mouseup のイベントリスナーの実装
-// hintからのmouseenter mouseleaveイベントの分離
-
 class CopyXPost {
 	
 	static {
@@ -75,12 +70,6 @@ class CopyXPost {
 		const { target } = event, { dataset: { constrainedAboutHint } } = target, label = target.querySelector('.label');
 		let hintNode;
 		
-		//label &&	(
-		//				label.toggleAttribute('data-cxp-label-exited', false),
-		//				void label.offsetWidth,
-		//				label.toggleAttribute('data-cxp-label-entered', true)
-		//			);
-		
 		(constrainedAboutHint && (hintNode = document.getElementById(constrainedAboutHint))) ||
 			(
 				(hintNode = await ShadowElement.create('hint')).constrained = target,
@@ -115,9 +104,9 @@ class CopyXPost {
 			for (const button of shadowRoot.querySelectorAll('#buttons button'))
 				handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button);
 			
-			//handler.addLifetimeEvent('animationend', exitedAnimation),
-			
-			target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
+			//target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
+			target.querySelector(SELECTOR_CARET)?.parentElement.parentElement.parentElement.parentElement.
+				prepend?.(node = node.element);
 			
 		}
 		
@@ -125,16 +114,6 @@ class CopyXPost {
 			node.toggleAttribute('data-cxp-exited', false);
 		
 	}
-	
-	//static exitedAnimation(event) {
-	//	
-	//	event.stopPropagation();
-	//	
-	//	const { animationName, target } = event;
-	//	
-	//	animationName === 'exit' && target?.handler?.purge?.(undefined, true);
-	//	
-	//}
 	
 	static leftPost(event) {
 		
@@ -284,17 +263,6 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 		this.tag = 'cxp',
 		this.templateURL = 'shadow-copy-x-post-element.html';
 		
-		//this.balloonResetAnimeTriggerBefore =
-		//	{
-		//		attr:	[
-		//					{ method: 'remove', name: 'enter-anime-begun' },
-		//					{ method: 'remove', name: 'enter-anime-ended' },
-		//					{ method: 'remove', name: 'initiated' },
-		//					{ method: 'remove', name: 'leave-anime-begun' },
-		//					{ method: 'remove', name: 'leave-anime-ended' }
-		//				]
-		//	};;
-		
 	}
 	
 	static [ShadowScraperElement.$scrapers] = [
@@ -309,7 +277,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 				{ element } = this,
 				scraped = this.scrape(element.closest(ShadowCopyXPostElement.SELECTOR_POST)),
 				{ plainPostText } = scraped;
-		hi(scraped);
+		//hi(scraped);
 		plainPostText && navigator.clipboard.writeText(plainPostText.join('')).then(copied.bind(this, event.target));
 		
 		event.preventDefault(), event.stopPropagation();
@@ -361,7 +329,6 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 	static notifyEndToBalloon(event) {
 		
 		const { target } = event, { dataset: { constrainedAboutBalloon } } = target;
-		//hi(event.target,balloon,constrainedAboutBalloon);
 		
 		if (constrainedAboutBalloon) {
 			
@@ -369,7 +336,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 					{ handler } = target,
 					balloon = document.getElementById(constrainedAboutBalloon);
 			
-			balloon.hasAttribute('leave-anime-begun') ||
+			balloon?.hasAttribute?.('leave-anime-begun') ||
 				(
 					balloon ?
 						animationName === handler.leaveAnime ?
@@ -378,7 +345,6 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 						target.removeEventListener(type, ShadowCopyXPostElement.notifyEndToBalloon)
 				);
 			
-			//hi(target, balloon, animationName, handler.leaveAnime, animationName === handler.leaveAnime,balloon.handler.finish);
 		}
 		
 	}
@@ -402,7 +368,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 			balloon.enterAnime = 'balloon-spawn',
 			balloon.leaveAnime = 'exit',
 			//balloon.sbcvAfterAnime = 'enter-anime-begun',
-			//balloon.purgeAfterAnime = 'leave-anime-ended',
+			balloon.purgeAfterAnime = 'leave-anime-ended',
 			document.body.prepend(balloon.element),
 			balloon.constrained = element;
 			
@@ -430,12 +396,13 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 									undefined,
 									shadowRoot.getElementById('copy-button')
 								),
-		this.addLifetimeEvent	(
-									'click',
-									this.clickedDevCopyButton = clickedDevCopyButton.bind(this),
-									undefined,
-									shadowRoot.getElementById('dev-copy-button')
-								);
+		shadowRoot.getElementById('dev-copy-button') &&
+			this.addLifetimeEvent	(
+										'click',
+										this.clickedDevCopyButton = clickedDevCopyButton.bind(this),
+										undefined,
+										shadowRoot.getElementById('dev-copy-button')
+									);
 		
 	}
 	
@@ -577,13 +544,13 @@ class ShadowConstrainedElement extends ShadowInteractiveElement {
 	
 }
 
-class ShadowHintElement extends ShadowConstrainedElement {
+class ShadowPopupElement extends ShadowConstrainedElement {
 	
 	static {
 		
-		this[ShadowConstrainedElement.$defaultAbout] = 'hint',
+		this[ShadowConstrainedElement.$defaultAbout] = 'popup',
 		
-		this.tag = 'hint',
+		this.tag = 'popup',
 		
 		this.resetAnimeTriggerBefore =
 			{ attr:	[ ...super.resetAnimeTriggerBefore.attr, { method: 'remove', name: 'exiting' } ] };
@@ -592,7 +559,8 @@ class ShadowHintElement extends ShadowConstrainedElement {
 	
 	static changedAnimationState(event) {
 		
-		Object.getPrototypeOf(this.constructor).changedAnimationState.call(this, event, this.constrained);
+		//Object.getPrototypeOf(this.constructor).changedAnimationState.call(this, event, this.constrained);
+		ShadowInteractiveElement.changedAnimationState.call(this, event, this.constrained);
 		
 	}
 	
@@ -615,7 +583,7 @@ class ShadowHintElement extends ShadowConstrainedElement {
 		
 		super();
 		
-		const { enteredConstrained, leftConstrained } = ShadowHintElement;
+		const { enteredConstrained, leftConstrained } = ShadowPopupElement;
 		
 		this.enteredConstrained = enteredConstrained.bind(this),
 		this.leftConstrained = leftConstrained.bind(this);
@@ -639,11 +607,13 @@ class ShadowHintElement extends ShadowConstrainedElement {
 		
 	}
 	
+	
 	set constrained(v) {
 		
 		const { element } = this;
 		
-		(v = this.constrain(v)) && (element.dataset.alt = v.dataset.hintAlt, ShadowElement.setBoundToCSSVar(element, v));
+		(v = this.constrain(v)) &&
+			(element.dataset.alt = ShadowElement.i18n(v.dataset.hintAlt), ShadowElement.setBoundToCSSVar(element, v));
 		
 	}
 	get exiting() {
@@ -656,6 +626,24 @@ class ShadowHintElement extends ShadowConstrainedElement {
 		this.constrain(),
 		
 		this.element.toggleAttribute('exiting', !!v);
+		
+	}
+	
+}
+
+class ShadowHintElement extends ShadowPopupElement {
+	
+	static {
+		
+		this[ShadowConstrainedElement.$defaultAbout] = 'hint',
+		
+		this.tag = 'hint';
+		
+	}
+	
+	constructor() {
+		
+		super();
 		
 	}
 	
@@ -703,180 +691,3 @@ class ShadowBalloonElement extends ShadowConstrainedElement {
 	
 }
 ShadowBalloonElement.define();
-//class ShadowHintElement extends ShadowInteractiveElement {
-//	
-//	static {
-//		
-//		this.$constrained = Symbol('ShadowHintElement.constrained');
-//		
-//		this.condition = { state: 'end', name: 'hint-exit', purges: true },
-//		this.resetAnimeTriggerBefore =
-//			{ attr: [ { method: 'remove', name: 'exiting' }, { method: 'remove', name: 'spawned' } ] },
-//		this.tag = 'hint',
-//		
-//		this.observedAttributeInit = { attributes: true, attributeFilter: [ 'exit-name', 'id' ] };
-//		
-//	}
-//	
-//	static attributeChangedCallback(mrs) {
-//		
-//		const { length } = mrs;
-//		let i;
-//		
-//		i = -1;
-//		while (++i < length) {
-//			
-//			switch (mrs[i].attributeName) {
-//				
-//				case 'exit-name':
-//				this.conditions = [ { ...ShadowHintElement.condition, name: this.exitName } ];
-//				break;
-//				
-//				case 'id':
-//				
-//				const { constrained } = this;
-//				
-//				constrained instanceof Element && (constrained.dataset.constrainedHint = this.element.id);
-//				
-//				break;
-//				
-//			}
-//			
-//		}
-//		
-//	}
-//	
-//	static began(event) {
-//		
-//		const { animationName } = event, { exitName, spawnName } = this;
-//		
-//		((animationName === spawnName && (this.spawned = true)) || animationName === exitName) &&
-//			this.constrain();
-//		
-//	}
-//	
-//	static enteredConstrained(event) {
-//		
-//		this.resetAnime();
-//		
-//	}
-//	
-//	static leftConstrained(event) {
-//		
-//		this.enterAnimeBegun ? (this.exiting = true) : this.purge(undefined, true);
-//		
-//	}
-//	
-//	constructor() {
-//		
-//		super();
-//		
-//		const	{
-//					attributeChangedCallback,
-//					began,
-//					condition,
-//					enteredConstrained,
-//					leftConstrained,
-//					observedAttributeInit
-//				} = ShadowHintElement;
-//		
-//		this.enteredConstrained = enteredConstrained.bind(this),
-//		this.leftConstrained = leftConstrained.bind(this),
-//		
-//		(new MutationObserver(this.attributeChangedCallback = attributeChangedCallback.bind(this))).
-//			observe(this.element, observedAttributeInit),
-//		
-//		this.conditions = [ { ...condition } ],
-//		
-//		this.addLifetimeEvent('animationstart', this.began = ShadowHintElement.began.bind(this));
-//		
-//	}
-//	
-//	constrain(constrained) {
-//		
-//		const	{ $constrained } = ShadowHintElement,
-//				handler = this instanceof ShadowHintElement ? this : this.handler,
-//				{ enteredConstrained, leftConstrained } = handler,
-//				lastConstrained = handler[$constrained];
-//		
-//		lastConstrained instanceof Element &&
-//			(
-//				delete lastConstrained.dataset.constrainedHint,
-//				lastConstrained.removeEventListener('mouseenter', enteredConstrained),
-//				lastConstrained.removeEventListener('mouseleave', leftConstrained)
-//			);
-//		
-//		if (
-//				constrained = handler[$constrained] =	constrained instanceof Element ? constrained :
-//															constrained instanceof ShadowElement ? constrained.element :
-//																constrained === undefined ? lastConstrained : null
-//		) {
-//			
-//			const { element } = this, { dataset } = constrained;
-//			
-//			(element.id ||= crypto.randomUUID()) === dataset.constrainedHint || (dataset.constrainedHint = element.id),
-//			element.dataset.alt = dataset.hintAlt,
-//			ShadowElement.setBoundToCSSVar(element, constrained),
-//			
-//			this.addLifetimeEvent('mouseenter', enteredConstrained, undefined, constrained),
-//			this.addLifetimeEvent('mouseenter', leftConstrained, undefined, constrained);
-//			
-//		}
-//		
-//	}
-//	
-//	get constrained() {
-//		
-//		return this[ShadowHintElement.$constrained];
-//		
-//	}
-//	set constrained(v) {
-//		
-//		this.constrain(v);
-//		
-//	}
-//	get exiting() {
-//		
-//		return this.element.hasAttribute('exiting');
-//		
-//	}
-//	set exiting(v) {
-//		
-//		this.constrain(),
-//		
-//		this.element.toggleAttribute('exiting', !!v);
-//		
-//	}
-//	get exitName() {
-//		
-//		return this.element.getAttribute('exit-name');
-//		
-//	}
-//	set exitName(v) {
-//		
-//		this.element.setAttribute('exit-name', v);
-//		
-//	}
-//	get spawned() {
-//		
-//		return this.element.hasAttribute('spawned');
-//		
-//	}
-//	set spawned(v) {
-//		
-//		this.element.toggleAttribute('spawned', !!v);
-//		
-//	}
-//	get spawnName() {
-//		
-//		return this.element.getAttribute('spawn-name');
-//		
-//	}
-//	set spawnName(v) {
-//		
-//		this.element.setAttribute('spawn-name', v);
-//		
-//	}
-//	
-//}
-//ShadowHintElement.define();

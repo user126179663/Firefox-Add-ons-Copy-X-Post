@@ -29,68 +29,7 @@
 	animation: exit .3s ease-out 0s 1 reverse forwards running !important;
 	
 }
-/*@keyframes spawn {
-	0% {
-		opacity: .5;
-		scale: 100% 0%;
-	}
-	5% {
-		opacity: 1;
-		scale: 130% 33%;
-	}
-	15% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	40% {
-		translate: 0 -40%;
-	}
-	50% {
-		translate: 0 -40%;
-	}
-	75% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	87.5% {
-		scale: 130% 75%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
-}
-@keyframes exit {
-	0% {
-		opacity: .5;
-		scale: 100% 0%;
-	}
-	5% {
-		opacity: 1;
-		scale: 130% 33%;
-	}
-	15% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	40% {
-		translate: 0 -40%;
-	}
-	50% {
-		translate: 0 -40%;
-	}
-	75% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	87.5% {
-		scale: 130% 75%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
-}*/
 
-/*:host([data-cxp-entered]) #buttons button:hover .label,*/
 :host(:not([data-cxp-left])) #buttons button[entered]:not([enter-anime-ended]):not([enter-anime-canceled]):not([pressed]) .label {
 	
 	animation: bounce .3s ease-out 0s 1 normal forwards running;
@@ -159,7 +98,6 @@
 }
 #buttons button[released]:not([release-anime-ended]):not([interrupted-release-anime]) .label {
 	
-	/*animation: shake .3s cubic-bezier(.56,3.26,0,-1.37) 0s 1 normal forwards running !important;*/
 	animation: shake .2s cubic-bezier(.51,3.83,.72,-0.63) 0s 1 normal forwards running !important;
 	
 }
@@ -177,60 +115,3 @@
 	}
 	
 }
-
-/*
-:host(:not([data-cxp-left])) #buttons button:active .label {
-	
-	--animation: shake .3s ease-out 0s 1 normal forwards running !important;
-	
-}
-@keyframes shake {
-	
-	0% {
-		
-		scale: 100%;
-		
-	}
-	10% {
-		
-		scale: 33%;
-		
-	}
-	20% {
-		
-		scale: 33%;
-		
-	}
-	50% {
-		
-		scale: 120%;
-		
-	}
-	60% {
-		
-		scale: 66.7%;
-		
-	}
-	70% {
-		
-		scale: 110%;
-		
-	}
-	80% {
-		
-		scale: 80%;
-		
-	}
-	90% {
-		
-		scale: 105%;
-		
-	}
-	100% {
-		
-		scale: 100%;
-		
-	}
-	
-}
-*/

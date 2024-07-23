@@ -39,6 +39,12 @@ class ShadowElement {
 		
 	}
 	
+	static i18n(text) {
+		
+		return text.indexOf('@@') ? text : (browser.i18n.getMessage(text.slice(2)) ?? text);
+		
+	}
+	
 	static isPrototypeProperty(proto, key) {
 		
 		const { hasOwn } = Object;
@@ -170,7 +176,6 @@ class ShadowElement {
 						
 						const	elements =	ShadowElement.composedSelect
 												(rootNode ? target.getRootNode() : rootNode, true, ...element),
-								//elements = [ ...(root || target.getRootNode())?.querySelectorAll?.(src.element) ],
 								{ length } = elements,
 								values = [];
 						let i;
@@ -356,12 +361,6 @@ class ShadowAnimationConditionsElement extends ShadowElement {
 		this[this.$observedAttributes] = [ 'begin', 'end' ];
 		
 	}
-	
-	//static get observedAttributes() {
-	//	
-	//	return this[ShadowElement.$observedAttributes];
-	//	
-	//}
 	
 	static animated(event) {
 		
@@ -586,34 +585,6 @@ class ShadowAnimationConditionsElement extends ShadowElement {
 		
 	}
 	
-	//static gather(descriptors, keys, values) {
-	//	
-	//	const { isArray } = Array;
-	//	
-	//	isArray(descriptors) || (descriptors = [ descriptors ]),
-	//	isArray(keys) || (keys = [ keys ]),
-	//	isArray(values) || (values = [ values ]);
-	//	
-	//	const { length } = descriptors, gathered = [];
-	//	let i,i0, k,k0, descriptor;
-	//	
-	//	i = i0 = -1;
-	//	while (++i < length) {
-	//		
-	//		if ((descriptor = descriptors[i]) && typeof descriptor === 'object') {
-	//			
-	//			for (k in descriptor) if (keys.includes(k) && values.includes(descriptor[k]) && (k0 = k)) break;
-	//			
-	//			k0 && (k0 = void (gathered[++i0] = descriptor));
-	//			
-	//		}
-	//		
-	//	}
-	//	
-	//	return gathered;
-	//	
-	//}
-	
 	static handleData(target, data) {
 		
 		if (target instanceof Element && data && typeof data === 'object') {
@@ -809,7 +780,7 @@ class ShadowAnimationConditionsElement extends ShadowElement {
 		
 		return true;
 		
-	};
+	}
 	
 	constructor() {
 		
@@ -822,15 +793,7 @@ class ShadowAnimationConditionsElement extends ShadowElement {
 								this.addLifetimeEvent(k + SUFFIX_COMPOSED_EVENT_TYPE, boundAnimated);
 		
 	}
-	//attributeChangedCallback(name, last, current) {
-	//	
-	//	switch (name) {
-	//		case 'begin':
-	//		case 'end':
-	//		
-	//	}
-	//	
-	//}
+	
 	addAnimationConditions() {
 		
 		const { conditions = [] } = this, { length } = arguments;
@@ -868,13 +831,10 @@ class ShadowAnimationConditionsElement extends ShadowElement {
 				)
 	{
 		
-		//delete this.dataset.cxpHintExiting,
-		//delete this.dataset.cxpHintSpawned,
-		
 		const { handleData } = ShadowAnimationConditionsElement, { element } = this;
-		//hi(this.element,before,after);
+		
 		before && handleData(element, before),
-		//hi(this.element,before,after);
+		
 		void element.offsetWidth,
 		
 		after && handleData(element, after);
@@ -1247,8 +1207,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			
 		}
 		
-		//hi(contextPropertyDefinition);
-		
 		Object.defineProperties(prototype, contextPropertyDefinition);
 		
 		this.mouseupAfterOutOfBoundOption = { once: true };
@@ -1291,11 +1249,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			while (++i < i0)	this['interrupted' + type[interrupted[i]].capitalized + 'Anime'] = true,
 								this[value + 'Interrupted'] = true;
 			
-			//coco CSS含め。outOfBound後にmouseenterしてmouseupした時に専用のイベントを発生させる必要があるかもしれない。
-			//coco インタラクション中に他のインタラクションのアニメが再生中であれば、インタラクション中に紐付けられたアニメの再生の可否をコントロールするための
-			// can-cancel-leave-anime 的な属性を設定する。仕組み的には *-anime-iterating を通じて他のインタラクションのアニメの再生を確認する。
-			// それに加え割り込んだアニメの状態を示す interrupted-*-anime
-			// coco can-cancel-*-anime は interrupted-*-anime に変更。それらの新しく設定した属性値を CSS に反映して挙動の修正。
 			switch (eventType) {
 				
 				case 'mouseenter':
@@ -1304,7 +1257,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 				
 				case 'mouseleave':
 				const { pressed, released } = this;
-				//this.outOfBound = pressed && !released;
+				
 				(this.outOfBound = pressed && !released) &&
 					addEventListener('mouseup', mouseupAfterOutOfBound, mouseupAfterOutOfBoundOption);
 				break;
@@ -1333,7 +1286,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		
 		i = -1;
 		while (++i < length && ((v = anime[i]).eventType !== type || (this[v.valueName]) !== animationName));
-		//hi(i,length, type, animationName, this.element);
+		
 		if (i !== length) {
 			
 			const { element, purgeAfterAnime, sbcvAfterAnime } = this, { iterationName, name, value } = v;
@@ -1342,8 +1295,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			this[name] = true,
 			
 			this[iterationName] = type === 'animationstart' || type === 'animationiteration',
-			//hi(iterationName,this[iterationName],type);
-			//hi(animationName, type, iterationName,this[iterationName],name,this[name],this.element);
+			
 			sbcvAfterAnime?.includes?.(value) &&
 				this.setBoundToCSSVarAfter	(
 												{ event },
@@ -1497,226 +1449,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		
 	}
 	
-	//get enterAnime() {
-	//	
-	//	return this.element.getAttribute('enter-anime');
-	//	
-	//}
-	//set enterAnime(v) {
-	//	
-	//	this.element.setAttribute('enter-anime', v);
-	//	
-	//}
-	//get enterAnimeBegun() {
-	//	
-	//	return this.element.hasAttribute('enter-anime-begun');
-	//	
-	//}
-	//set enterAnimeBegun(v) {
-	//	
-	//	this.element.toggleAttribute('enter-anime-begun', !!v);
-	//	
-	//}
-	//get enterAnimeCanceled() {
-	//	
-	//	return this.element.hasAttribute('enter-anime-canceled');
-	//	
-	//}
-	//set enterAnimeCanceled(v) {
-	//	
-	//	this.element.toggleAttribute('enter-anime-canceled', !!v);
-	//	
-	//}
-	//get enterAnimeEnded() {
-	//	
-	//	return this.element.hasAttribute('enter-anime-ended');
-	//	
-	//}
-	//set enterAnimeEnded(v) {
-	//	
-	//	this.element.toggleAttribute('enter-anime-ended', !!v);
-	//	
-	//}
-	//get enterAnimeIterating() {
-	//	
-	//	return this.element.hasAttribute('enter-anime-iterating');
-	//	
-	//}
-	//set enterAnimeIterating(v) {
-	//	
-	//	this.element.toggleAttribute('enter-anime-iterating', !!v);
-	//	
-	//}
-	//get entered() {
-	//	
-	//	return this.element.hasAttribute('entered');
-	//	
-	//}
-	//set entered(v) {
-	//	
-	//	this.element.toggleAttribute('entered', !!v);
-	//	
-	//}
-	//get enterInterrupted() {
-	//	
-	//	return this.element.hasAttribute('enter-interrupted');
-	//	
-	//}
-	//set enterInterrupted(v) {
-	//	
-	//	this.element.toggleAttribute('enter-interrupted', !!v);
-	//	
-	//}
-	//get initiateAnime() {
-	//	
-	//	return this.element.getAttribute('initiate-anime');
-	//	
-	//}
-	//set initiateAnime(v) {
-	//	
-	//	this.element.setAttribute('initiate-anime', v);
-	//	
-	//}
-	//get initiateAnimeBegun() {
-	//	
-	//	return this.element.hasAttribute('initiate-anime-begun');
-	//	
-	//}
-	//set initiateAnimeBegun(v) {
-	//	
-	//	this.element.toggleAttribute('initiate-anime-begun', !!v);
-	//	
-	//}
-	//get initiateAnimeIterating() {
-	//	
-	//	return this.element.hasAttribute('initiate-anime-iterating');
-	//	
-	//}
-	//set initiateAnimeIterating(v) {
-	//	
-	//	this.element.toggleAttribute('initiate-anime-iterating', !!v);
-	//	
-	//}
-	//get initiated() {
-	//	
-	//	return this.element.hasAttribute('initiated');
-	//	
-	//}
-	//set initiated(v) {
-	//	
-	//	this.element.toggleAttribute('initiated', !!v);
-	//	
-	//}
-	//get interruptedEnterAnime() {
-	//	
-	//	return this.element.hasAttribute('interrupted-enter-anime');
-	//	
-	//}
-	//set interruptedEnterAnime(v) {
-	//	
-	//	this.element.toggleAttribute('interrupted-enter-anime', !!v);
-	//	
-	//}
-	//get interruptedInitiateAnime() {
-	//	
-	//	return this.element.hasAttribute('interrupted-initiate-anime');
-	//	
-	//}
-	//set interruptedInitiateAnime(v) {
-	//	
-	//	this.element.toggleAttribute('interrupted-initiate-anime', !!v);
-	//	
-	//}
-	//get interruptedLeaveAnime() {
-	//	
-	//	return this.element.hasAttribute('interruptedLeaveAnime');
-	//	
-	//}
-	//set interruptedLeaveAnime(v) {
-	//	
-	//	this.element.toggleAttribute('interruptedLeaveAnime', !!v);
-	//	
-	//}
-	//get interruptedPressAnime() {
-	//	
-	//	return this.element.hasAttribute('interrupted-press-anime');
-	//	
-	//}
-	//set interruptedPressAnime(v) {
-	//	
-	//	this.element.toggleAttribute('interrupted-press-anime', !!v);
-	//	
-	//}
-	//get interruptedReleaseAnime() {
-	//	
-	//	return this.element.hasAttribute('interrupted-release-anime');
-	//	
-	//}
-	//set interruptedReleaseAnime(v) {
-	//	
-	//	this.element.toggleAttribute('interrupted-release-anime', !!v);
-	//	
-	//}
-	//get leaveAnime() {
-	//	
-	//	return this.element.getAttribute('leave-anime');
-	//	
-	//}
-	//set leaveAnime(v) {
-	//	
-	//	this.element.setAttribute('leave-anime', v);
-	//	
-	//}
-	//get leaveAnimeBegun() {
-	//	
-	//	return this.element.hasAttribute('leave-anime-begun');
-	//	
-	//}
-	//set leaveAnimeBegun(v) {
-	//	
-	//	this.element.toggleAttribute('leave-anime-begun', !!v);
-	//	
-	//}
-	//get leaveAnimeCanceled() {
-	//	
-	//	return this.element.hasAttribute('leave-anime-canceled');
-	//	
-	//}
-	//set leaveAnimeCanceled(v) {
-	//	
-	//	this.element.toggleAttribute('leave-anime-canceled', !!v);
-	//	
-	//}
-	//get leaveAnimeEnded() {
-	//	
-	//	return this.element.hasAttribute('leave-anime-ended');
-	//	
-	//}
-	//set leaveAnimeEnded(v) {
-	//	
-	//	this.element.toggleAttribute('leave-anime-ended', !!v);
-	//	
-	//}
-	//get leaveAnimeIterating() {
-	//	
-	//	return this.element.hasAttribute('leave-anime-iterating');
-	//	
-	//}
-	//set leaveAnimeIterating(v) {
-	//	
-	//	this.element.toggleAttribute('leave-anime-iterating', !!v);
-	//	
-	//}
-	//get left() {
-	//	
-	//	return this.element.hasAttribute('left');
-	//	
-	//}
-	//set left(v) {
-	//	
-	//	this.element.toggleAttribute('left', !!v);
-	//	
-	//}
 	get outOfBound() {
 		
 		return this.element.hasAttribute('out-of-bound');
@@ -1727,66 +1459,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		this.element.toggleAttribute('out-of-bound', !!v);
 		
 	}
-	//get pressAnime() {
-	//	
-	//	return this.element.getAttribute('press-anime');
-	//	
-	//}
-	//set pressAnime(v) {
-	//	
-	//	this.element.setAttribute('press-anime', v);
-	//	
-	//}
-	//get pressAnimeBegun() {
-	//	
-	//	return this.element.hasAttribute('press-anime-begun');
-	//	
-	//}
-	//set pressAnimeBegun(v) {
-	//	
-	//	this.element.toggleAttribute('press-anime-begun', !!v);
-	//	
-	//}
-	//get pressAnimeCanceled() {
-	//	
-	//	return this.element.hasAttribute('press-anime-canceled');
-	//	
-	//}
-	//set pressAnimeCanceled(v) {
-	//	
-	//	this.element.toggleAttribute('press-anime-canceled', !!v);
-	//	
-	//}
-	//get pressAnimeEnded() {
-	//	
-	//	return this.element.hasAttribute('press-anime-ended');
-	//	
-	//}
-	//set pressAnimeEnded(v) {
-	//	
-	//	this.element.toggleAttribute('press-anime-ended', !!v);
-	//	
-	//}
-	//get pressAnimeIterating() {
-	//	
-	//	return this.element.hasAttribute('press-anime-iterating');
-	//	
-	//}
-	//set pressAnimeIterating(v) {
-	//	
-	//	this.element.toggleAttribute('press-anime-iterating', !!v);
-	//	
-	//}
-	//get pressed() {
-	//	
-	//	return this.element.hasAttribute('pressed');
-	//	
-	//}
-	//set pressed(v) {
-	//	
-	//	this.element.toggleAttribute('pressed', !!v);
-	//	
-	//}
 	get purgeAfterAnime() {
 		
 		const { element } = this;
@@ -1819,66 +1491,6 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			this.element.setAttribute('purge-after-interactions', Array.isArray(v) ? v.join(' ') : v);
 		
 	}
-	//get releaseAnime() {
-	//	
-	//	return this.element.getAttribute('release-anime');
-	//	
-	//}
-	//set releaseAnime(v) {
-	//	
-	//	this.element.setAttribute('release-anime', v);
-	//	
-	//}
-	//get releaseAnimeBegun() {
-	//	
-	//	return this.element.hasAttribute('release-anime-begun');
-	//	
-	//}
-	//set releaseAnimeBegun(v) {
-	//	
-	//	this.element.toggleAttribute('release-anime-begun', !!v);
-	//	
-	//}
-	//get releaseAnimeCanceled() {
-	//	
-	//	return this.element.hasAttribute('release-anime-canceled');
-	//	
-	//}
-	//set releaseAnimeCanceled(v) {
-	//	
-	//	this.element.toggleAttribute('release-anime-canceled', !!v);
-	//	
-	//}
-	//get releaseAnimeEnded() {
-	//	
-	//	return this.element.hasAttribute('release-anime-ended');
-	//	
-	//}
-	//set releaseAnimeEnded(v) {
-	//	
-	//	this.element.toggleAttribute('release-anime-ended', !!v);
-	//	
-	//}
-	//get releaseAnimeIterating() {
-	//	
-	//	return this.element.hasAttribute('release-anime-iterating');
-	//	
-	//}
-	//set releaseAnimeIterating(v) {
-	//	
-	//	this.element.toggleAttribute('release-anime-iterating', !!v);
-	//	
-	//}
-	//get released() {
-	//	
-	//	return this.element.hasAttribute('released');
-	//	
-	//}
-	//set released(v) {
-	//	
-	//	this.element.toggleAttribute('released', !!v);
-	//	
-	//}
 	get requirementsForPurgeAfter() {
 		
 		return JSON.parse(this.element.getAttribute('purge-after'));

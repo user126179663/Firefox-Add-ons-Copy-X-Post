@@ -1,17 +1,10 @@
 {
 	
-	"manifest_version": 3,
-	
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "{05d0a5dc-4140-44a4-b446-6cdc768af381}"
 		}
 	},
-	
-	"name": "Backup 𝕏 Post",
-	"short_name": "bxp",
-	"version": "0.1",
-	"description": "Xのポストをコピーします。",
 	
 	"content_scripts": [
 		{
@@ -21,7 +14,23 @@
 		}
 	],
 	
+	"default_locale": "en",
+	
+	"description": "__MSG_extensionDescription__",
+	
 	"host_permissions": [ "*://twitter.com/*", "*://x.com/*" ],
+	
+	"icons": {
+		"48": "icon.svg"
+	},
+	
+	"manifest_version": 3,
+	
+	"name": "__MSG_extensionName__",
+	
+	"short_name": "cxp",
+	
+	"version": "1",
 	
 	"web_accessible_resources": [
 		{

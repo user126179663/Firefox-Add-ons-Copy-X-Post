@@ -2,8 +2,12 @@
 	
 	--balloon-bg-color: var(--accent-color, rgba(255,255,255,1));
 	--balloon-border-color: rgba(0,0,0,1);
+	--balloon-border-radius: .3rem;
 	--balloon-border-width-value: 1;
 	--balloon-border-width: calc(1px * var(--balloon-border-width-value));
+	--balloon-box-shadow-outline: 0 0 0 var(--balloon-border-width) var(--balloon-border-color);
+	--balloon-box-shadow-dropped: 0 0 .5rem 1px rgba(0,0,0,.2);
+	--balloon-padding: .5rem .6rem;
 	
 	--balloon-direction-size: 6px;
 	--balloon-direction-positioin-ratio-x: .2;
@@ -19,11 +23,11 @@
 		linear-gradient(-75deg, transparent 0%, transparent 10%, white 10.1%, white 80%, transparent 90.1%);
 	
 	background: var(--balloon-bg-color);
-	border-radius: .3rem;
-	box-shadow: 0 0 0 var(--balloon-border-width) var(--balloon-border-color), 0 0 .5rem 1px rgba(0,0,0,.2);
+	border-radius: var(--balloon-border-radius);
+	box-shadow: var(--balloon-box-shadow-outline), var(--balloon-box-shadow-dropped);
 	font: normal normal normal .6rem/1 sans-serif;
 	left: calc(var(--bound-1-left) + var(--scroll-x) + (var(--bound-1-width) - (var(--bound-width) * var(--balloon-direction-positioin-ratio-x) * 2)) / 2);
-	padding: .5rem .6rem;
+	padding: var(--balloon-padding);
 	pointer-events: none;
 	position: absolute;
 	top: calc((var(--bound-1-top) + var(--scroll-y) + var(--bound-height) * -1.4));
@@ -34,8 +38,12 @@
 [shadow="balloon"].checked {
 	
 	--balloon-bg-color: var(--accent-color, rgba(40,220,80,1));
+	--balloon-bg-color: var(--accent-color, rgb(29, 155, 240));
 	--balloon-border-color: rgba(40,160,80,1);
+	--balloon-border-radius: 40%;
 	--balloon-border-width-value: 2;
+	
+	--balloon-direction-after-translate: 0 75%;
 	
 	--balloon-check-mark-width: 3px;
 	--balloon-check-mark-bound-height: .5rem;
@@ -112,6 +120,8 @@
 [shadow="balloon"]::after,
 [shadow="balloon"]::before {
 	
+	--balloon-direction-left: calc(var(--bound-width) * var(--balloon-direction-positioin-ratio-x));
+	
 	border-bottom: var(--balloon-direction-size) solid rgba(0,0,0,0);
 	border-left: var(--balloon-direction-size) solid var(--balloon-border-color);
 	bottom: 0;
@@ -120,7 +130,7 @@
 	display: block;
 	position: absolute;
 	translate: 0 100%;
-	left: calc(var(--bound-width) * var(--balloon-direction-positioin-ratio-x));
+	left: var(--balloon-direction-left);
 	
 }
 [shadow="balloon"].flat::after,
@@ -172,6 +182,7 @@
 	display: block;
 	height: var(--balloon-check-mark-bound-height);
 	rotate: -45deg;
+	translate: 0 -17.5%;
 	width: var(--balloon-check-mark-bound-width);
 	
 }

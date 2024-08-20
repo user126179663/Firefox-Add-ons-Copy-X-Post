@@ -1,0 +1,278 @@
+/* 共有アニメーション */
+@keyframes noop-initiate { from {} to {} }
+@keyframes noop-enter { from {} to {} }
+@keyframes noop-leave { from {} to {} }
+@keyframes noop-press { from {} to {} }
+@keyframes noop-release { from {} to {} }
+/* original 用のアニメーション*/
+@keyframes spawn {
+	0% {
+		opacity: .5;
+		scale: 100% 0%;
+	}
+	5% {
+		opacity: 1;
+		scale: 130% 33%;
+	}
+	15% {
+		scale: 80% 100%;
+		translate: 0 0%;
+	}
+	40% {
+		translate: 0 -40%;
+	}
+	50% {
+		translate: 0 -40%;
+	}
+	75% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	87.5% {
+		scale: 130% 75%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+@keyframes exit {
+	0% {
+		opacity: .5;
+		scale: 100% 0%;
+	}
+	5% {
+		opacity: 1;
+		scale: 130% 33%;
+	}
+	15% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	40% {
+		translate: 0 -40%;
+	}
+	50% {
+		translate: 0 -40%;
+	}
+	75% {
+		scale: 80% 100%;
+		translate: 0 0%;
+	}
+	87.5% {
+		scale: 130% 75%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+@keyframes bounce {
+	0% {
+		scale: 100% 100%;
+	}
+	33.3% {
+		opacity: 1;
+		scale: 130% 66.7%;
+	}
+	50% {
+		scale: 90% 120%;
+	}
+	75% {
+		scale: 110% 95%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+@keyframes bounce-leave {
+	0% {
+		scale: 100% 100%;
+	}
+	33.3% {
+		opacity: 1;
+		scale: 130% 66.7%;
+	}
+	50% {
+		scale: 90% 120%;
+	}
+	75% {
+		scale: 110% 95%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}
+@keyframes bounce-press {
+	
+	from {
+		
+		scale: 1;
+		
+	}
+	to {
+		
+		scale: .9;
+		
+	}
+	
+}
+@keyframes bounce-release {
+	
+	0% {
+		
+		scale: 1.4;
+		
+	}
+	100% {
+		
+		scale: 1;
+		
+	}
+	
+}
+
+@keyframes balloon-spawn {
+	
+	0% {
+		background: rgba(255,255,255,1);
+		rotate: y 270deg;
+		translate: 0 .8rem;
+	}
+	67% {
+		background: var(--accent-color);
+		rotate: y 360deg;
+	}
+	100% {
+		translate: 0;
+		rotate: y 360deg;
+	}
+	
+}
+@keyframes balloon-glimmer {
+	
+	from {
+		
+		background:	calc(var(--balloon-glimmer-size-width) * -1) top/
+					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
+					no-repeat
+					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
+		
+	}
+	to {
+		
+		background:	calc(100% + var(--balloon-glimmer-size-width) * 1) top/
+					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
+					no-repeat
+					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
+	}
+	
+}
+
+/* less-anime 用のアニメーション */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		translate: 0 10%;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0%;
+	}
+}
+@keyframes fade-out {
+	from {
+		opacity: 1;
+		translate: 0 0%;
+	}
+	to {
+		opacity: 0;
+		translate: 0 10%;
+	}
+}
+@keyframes press {
+	from {
+		translate: 0 0%;
+	}
+	to {
+		translate: 0 15%;
+	}
+}
+@keyframes release {
+	from {
+		translate: 0 15%;
+	}
+	to {
+		translate: 0 0%;
+	}
+}
+
+@keyframes balloon-less-anime-initiate {
+	from {
+		opacity: 0;
+		translate: 0 .8rem;
+	}
+	to {
+		opacity: 1;
+		translate: 0;
+	}
+}
+@keyframes balloon-less-anime-leave {
+	from {
+		opacity: 1;
+		translate: 0;
+	}
+	to {
+		opacity: 0;
+		translate: 0 -.4rem;
+	}
+}
+
+/* no-anime 用のアニメーション */
+@keyframes in {
+	from { visibility: hidden; }
+	to { visibility: visible; }
+}
+@keyframes out {
+	from { visibility: visible; }
+	to { visibility: hidden; }
+}
+@keyframes down {
+	from { translate: 0% 15%; }
+	to { translate: 0% 15%; }
+}
+@keyframes up {
+	from { translate: 0% 0%; }
+	to { translate: 0% 0%; }
+}
+
+/* その他 */
+@keyframes bounce-infinite {
+	0% {
+		scale: 100%;
+	}
+	75% {
+		scale: 100%;
+	}
+	77.5% {
+		scale: 130% 20%;
+	}
+	79% {
+		scale: 67% 100%;
+		translate: 0 0%;
+	}
+	85% {
+		translate: 0 -33%;
+	}
+	88.5% {
+		translate: 0 -33%;
+	}
+	90% {
+		scale: 100% 100%;
+		translate: 0 0%;
+	}
+	96.875% {
+		scale: 130% 50%;
+	}
+	100% {
+		scale: 100% 100%;
+	}
+}

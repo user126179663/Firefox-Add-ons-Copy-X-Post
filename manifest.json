@@ -1,5 +1,11 @@
 {
 	
+	"background": {
+		
+		"scripts": [ "grapheme-splitter.js", "eastasianwidth.js", "utils.js", "basement.js", "background.js" ]
+		
+	},
+	
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "{05d0a5dc-4140-44a4-b446-6cdc768af381}"
@@ -8,21 +14,19 @@
 	
 	"content_scripts": [
 		{
-			"css":	[
-						"css/common.css",
-						"css/default.css",
-						"css/shadow-copy-x-post-hint.css",
-						"css/shadow-copy-x-post-balloon.css"
-					],
+			"css":	[ "css/default.css" ],
 			"js":	[
+						"grapheme-splitter.js",
+						"eastasianwidth.js", 
 						"utils.js",
 						"shadow-element.js",
+						"basement.js",
 						"copy-x-post.js",
 						"content_script.js"
 					],
 			"matches":	[
-							"*://twitter.com/*",
-							"*://x.com/*"
+							"https://twitter.com/*",
+							"https://x.com/*"
 						]
 		}
 	],
@@ -30,11 +34,6 @@
 	"default_locale": "en",
 	
 	"description": "__MSG_extensionDescription__",
-	
-	"host_permissions":	[
-							"*://twitter.com/*",
-							"*://x.com/*"
-						],
 	
 	"icons": {
 		"48": "images/icon.svg"
@@ -44,9 +43,18 @@
 	
 	"name": "__MSG_extensionName__",
 	
+	"options_ui": {
+		
+		"browser_style": false,
+		"page": "options_ui/index.html"
+		
+	},
+	
+	"permissions": [ "menus", "storage" ],
+	
 	"short_name": "cxp",
 	
-	"version": "1",
+	"version": "1.1",
 	
 	"web_accessible_resources": [
 		{
@@ -57,8 +65,10 @@
 			"resources":	[
 								"css/common.css",
 								"css/shadow-copy-x-post-element.css",
+								"css/shadow-copy-x-post-element-injected.css",
 								"html/shadow-copy-x-post-element.html",
-								"css/shadow-copy-x-post-element-injected.css"
+								"storage-default.json",
+								"storage-verifier.json"
 							]
 		}
 	]

@@ -1,71 +1,12 @@
-* {
+@import 'keyframes.css';
+
+[shadow], [shadow] *, :host([shadow]) * {
 	margin: 0;
 	padding: 0;
 }
 
-button {
+[shadow] button, :host([shadow]) button {
 	background: none;
 	border: none;
 	border-radius: 0;
-}
-
-@keyframes spawn {
-	0% {
-		opacity: .5;
-		scale: 100% 0%;
-	}
-	5% {
-		opacity: 1;
-		scale: 130% 33%;
-	}
-	15% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	40% {
-		translate: 0 -40%;
-	}
-	50% {
-		translate: 0 -40%;
-	}
-	75% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	87.5% {
-		scale: 130% 75%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
-}
-@keyframes exit {
-	0% {
-		opacity: .5;
-		scale: 100% 0%;
-	}
-	5% {
-		opacity: 1;
-		scale: 130% 33%;
-	}
-	15% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	40% {
-		translate: 0 -40%;
-	}
-	50% {
-		translate: 0 -40%;
-	}
-	75% {
-		scale: 100% 100%;
-		translate: 0 0%;
-	}
-	87.5% {
-		scale: 130% 75%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
 }

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="options">
+	<head>
+		<meta charset="UTF-8">
+		<title>Options | Copy 𝕏 Post</title>
+		<link rel="stylesheet" href="default.css">
+		<script src="../grapheme-splitter.js"></script>
+		<script src="../eastasianwidth.js"></script>
+		<script src="../utils.js"></script>
+		<script src="../browser.js"></script>
+		<script src="../shadow-element.js"></script>
+		<script src="../basement.js"></script>
+		<script src="../copy-x-post.js"></script>
+		<script src="options.js"></script>
+	</head>
+	<body>
+		
+		<!--<menu id="main-menu">
+			<ul>
+				<li class="dev-only"><a href="#disable-dev">通常用に切り換え</li>
+				<li><a href="#storage-area">ユーザーデータ</a></li>
+				<li><a href="#interface-area">インターフェース</a></li>
+			</ul>
+		</menu>-->
+		
+		<div id="container">
+			
+			<div id="storage-area">
+				<div id="storage-settings">
+					<h3>ユーザーデータ</h3>
+					<div id="storage-viewer-node" class="dev-only">
+						<textarea id="storage-viewer">aa</textarea>
+					</div>
+					<div id="storage-settings-buttons">
+						<div class="storage-settings-node">
+							<div class="storage-settings-controller">
+								<button id="storage-export-button" type="button">📁 エクスポート</button>
+							</div>
+							<div>現在のユーザーデータを JSON 形式のテキストファイルで出力します。この操作は現在のユーザーデータに影響を及ぼしません。</div>
+						</div>
+						<div class="storage-settings-node">
+							<div class="storage-settings-controller">
+								<button id="storage-import-button" type="button">📂 インポート</button>
+								<input id="storage-import-file" type="file">
+							</div>
+							<div>入力された JSON 形式のテキストファイルで、現在のユーザーデータを上書きします。入力したファイルに無効な値が含まれる場合、入力は受け付けません。この操作は不可逆です。</div>
+						</div>
+						<div class="storage-settings-node">
+							<div class="storage-settings-controller">
+								<button id="storage-initialize-button" type="button">初期化</button>
+							</div>
+							<div>現在のユーザーデータをインストール時の設定で初期化します。この操作は不可逆です。</div>
+						</div>
+						<div class="storage-settings-node dev-only">
+							<div class="storage-settings-controller">
+								<button id="storage-copy-button" type="button">コピー</button>
+							</div>
+							<div>現在のユーザーデータをクリップボードへコピーします。</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="interface-area">
+				<h3>インターフェース</h3>
+				<div class="option-node">
+					<input type="checkbox" id="checkbox-adds-context-menu">
+					<label for="checkbox-adds-context-menu"><span class="help" data-hint-alt="ポスト上で右クリックした時に表示されるメニューに、本機能の項目を追加します。右クリックメニューの表示がわずかに遅延する副作用があります。"></span>右クリックメニューに追加</label>
+				</div>
+				<div id="react-root"></div>
+			</div>
+			
+			<div id="disable-dev">
+				<h3>デバッグモード</h3>
+				<button id="disable-dev-button" type="button">切り換え</button>
+				<button id="wakeup-background-button" class="dev-only" type="button">バックグラウンドスクリプトを起動</button>
+			</div>
+			
+		</div>
+		
+		<template id="template-preview">
+			<div id="react-root">
+				<article id="preview" class="post">
+					<div class="icon-pane">
+						<div class="icon"></div>
+					</div>
+					<div class="content-node">
+						<header>
+							<aside class="meta">
+								<div class="identity">
+									<div class="screen-name">Name</div>
+									<div class="id">@ID</div>
+								</div>
+								<div class="separator"></div>
+								<div class="date"></div>
+							</aside>
+							<div class="dst"><div><div><div>
+								<div data-testid="caret">
+									<div class="menu">
+										<menu></menu>
+									</div>
+								</div>
+							</div></div></div></div>
+						</header>
+						<div class="body">
+							<div class="content">
+								<div data-testid="tweetText"><span shadow class="warn-icon"></span><span>今開いている X のタブに設定の変更を反映させるには、それらを再読み込みする必要があります！</span></div>
+								<fieldset>
+									<legend>アイコンの表示設定</legend>
+									<div class="information">
+										<div class="view-type"></div>
+									</div>
+									<div class="options">
+										<div class="option-node">
+											<input type="checkbox" id="checkbox-visible-always">
+											<label for="checkbox-visible-always"><span class="help" data-hint-alt="マウスカーソルの位置にかかわらず、アイコンはすべてのポスト内の所定の位置に常に表示され続けます。"></span>常に表示</label>
+										</div>
+									</div>
+									<input type="range" id="range-interface" min="0" max="3" value="2">
+								</fieldset>
+							</div>
+						</div>
+						<footer></footer>
+					</div>
+				</article>
+			</div>
+		</template>
+		
+	</body>
+</html>

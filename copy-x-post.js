@@ -1,15 +1,17 @@
-class CopyXPost {
+class CopyXPost extends CXPBasement {
 	
 	static {
 		
+		this[Logger.$icon] = '󠁪󠁪󠁪󠀽𝕏';
+		
 		this.SELECTOR_REACT_ROOT = '#react-root',
-		this.SELECTOR_MAIN_NODE = 'main[role="main"]',
 		this.SELECTOR_NEW_POST_BUTTON = 'header[role="banner"] a[data-testid="SideNav_NewTweet_Button"]',
 		this.SELECTOR_POST = 'main[role="main"] article[data-testid="tweet"]',
 		this.SELECTOR_CXP = 'div[shadow="cxp"]',
 		this.SELECTOR_CARET = '[data-testid="caret"]',
 		this.POST_TEXT_SELECTOR = '[data-testid="tweetText"]',
 		this.ATTR_MODIFIED = 'data-modified',
+		this.DEFAULT_INTERFACE = 'less-anime'
 		this.rxEmoji = /^https:\/\/.*?\.twimg\.com\/emoji\/.*?$/,
 		
 		this.bodyObserverInit = { childList: true, subtree: true },
@@ -17,25 +19,158 @@ class CopyXPost {
 		this.mainObserverInit = { childList: true, subtree: true },
 		this.bannerObserverInit = { childList: true, subtree: true },
 		
-		this.cxpAnimationButtonConditions = [
-			{
-				dataset: [ { name: 'cxpSpawned', value: '' } ],
-				name: 'spawn',
-				state: 'end'
-			},
-			{
-				dataset: [ { name: 'cxpSpawned' }, { name: 'cxpEntered' }, { name: 'cxpLeft' } ],
-				name: 'exit',
-				state: 'end'
+		this.configuration = {
+			
+			settings: {
+				
+				interfaceName: {
+					
+					remove(value) {
+						
+						const { constructor: { DEFAULT_INTERFACE } } = this;
+						
+						for (const shadow of document.querySelectorAll('[shadow]'))
+							shadow.dataset.cxpInterface = DEFAULT_INTERFACE;
+						
+					},
+					
+					update(value) {
+						
+						for (const shadow of document.querySelectorAll('[shadow]')) shadow.dataset.cxpInterface = value;
+						
+					}
+					
+				}
+				
 			}
-		];
+			
+		};
 		
 	}
 	
-	static async createCXP() {
+	static messageHandler = {
 		
-		const	{ cxpAnimationButtonConditions } = CopyXPost,
-				node = await ShadowElement.create('cxp'),
+		object: {
+			
+			['scrape-element-identified'](message, sender, sendResponse) {
+				
+				const scraped = this.constructor.scrapePost(this.targetElement = browser.menus.getTargetElement(message.info.targetElementId));
+				
+				sendResponse({ ...message, scraped });
+				
+			},
+			
+			['clicked-menu-item'](message, sender, sendResponse) {
+				
+				const { plainPostText } = this.constructor.scrapePost(browser.menus.getTargetElement(message.info.targetElementId) || this.targetElement);
+				
+				plainPostText && navigator.clipboard.writeText(plainPostText.join(''));
+				
+			}
+			
+		}
+		
+	};
+	
+	static bound = {
+		
+		async enteredPost(event) {
+			
+			const { target } = event;
+			let node, handler;
+			
+			if (node = target.querySelector(CopyXPost.SELECTOR_CXP)) {
+				
+				handler = node.handler,
+				node.toggleAttribute('data-cxp-left', false);
+				
+			} else {
+				
+				node = this.constructor.setCXP(target, this.stored.settings).element;
+				
+				//handler = node.handler;
+				//
+				//for (const button of shadowRoot.querySelectorAll('#buttons button'))
+				//	handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button);
+				//
+				////target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
+				//target.querySelector(SELECTOR_CARET)?.parentElement.parentElement.parentElement.parentElement.
+				//	prepend?.(node = node.element);
+				
+			}
+			
+			node instanceof Element && handler instanceof ShadowElement &&
+				(
+					node.toggleAttribute('data-cxp-exited', false)
+				);
+			
+		},
+		
+		shownContextMenu(event) {
+			
+			const { plainPostText } = this.constructor.scrapePost(this.contextualElement = event.target);
+			
+			plainPostText && navigator.clipboard.writeText(plainPostText.join(''));
+			
+			//this.contextualElement = event.target;
+			//const { SELECTOR_POST } = CopyXPost, post = event.target.closest(SELECTOR_POST);
+			//
+			//if (post) {
+			//	
+			//	const	{ $scrapers, scrape } = ShadowScraperElement,
+			//			scraped = ShadowScraperElement.scrape(post, ShadowCopyXPostElement[$scrapers]),
+			//			{ plainPostText } = scraped;
+			//	
+			//	plainPostText && navigator.clipboard.writeText(plainPostText.join(''));
+			//	
+			//}
+			
+		}
+		
+	};
+	
+	// このメソッドは this を用いるため、コンストラクターのオブジェクト.scrapePost() 形式で呼び出す必要がある。
+	static scrapePost(element) {
+		
+		if (element instanceof Element) {
+			
+			const	{ SELECTOR_POST, composedClosest } = this,
+					post = composedClosest(element, SELECTOR_POST);
+			
+			if (post) {
+				
+				const { $scrapers, scrape } = ShadowScraperElement;
+				
+				return scrape(post, ShadowCopyXPostElement[$scrapers]);
+				
+			}
+			
+		}
+		
+		return {};
+		
+	}
+	
+	static async setCXP(post, settings) {
+		
+		const	{ SELECTOR_CARET, createCXP, enteredButton, exitedAnimation, leftButton, leftPost } = CopyXPost,
+				node = await createCXP(settings),
+				{ element, handler, shadowRoot } = node;
+		
+		for (const button of shadowRoot.querySelectorAll('#buttons button'))
+			handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button);
+		
+		//target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
+		post.querySelector(SELECTOR_CARET)?.
+			parentElement.parentElement.parentElement.parentElement.prepend?.(element);
+		
+		return node;
+		
+	}
+	
+	static async createCXP(settings) {
+		
+		const	node = await ShadowElement.create('cxp'),
 				{ shadowRoot } = node;
 		let copyLabel, link, button;
 		
@@ -48,70 +183,142 @@ class CopyXPost {
 		for (button of shadowRoot.querySelectorAll('#buttons button')) {
 			
 			(button = await ShadowElement.create('interactive', button)).enterAnime = 'bounce',
-			button.initiateAnime = 'spawn',
-			button.leaveAnime = 'exit',
-			button.pressAnime = 'press',
-			button.releaseAnime = 'shake';
+			button.initiateAnime = 'spawn fade-in in noop-initiate',
+			button.leaveAnime = 'exit fade-out out noop-leave',
+			button.pressAnime = 'bounce-press press down noop-press',
+			button.releaseAnime = 'bounce-release release up noop-release';
 			
 			for (const label of button.querySelectorAll('.label')) await ShadowElement.create('interactive', label);
 			
 		}
 		
 		node.id = 'cxp-' + crypto.randomUUID(),
-		node.leaveAnime = 'exit',
-		node.purgeAfterAnime = 'leave-anime-ended';
+		node.leaveAnime = 'exit fade-out out noop-leave',
+		node.purgeAfterAnime = 'leave-anime-ended',
+		node.dataset.cxpInterface = settings.interfaceName;
 		
 		return node;
 		
 	}
 	
-	static async enteredButton(event) {
+	static async constrainedHint(target) {
 		
-		const { target } = event, { dataset: { constrainedAboutHint } } = target, label = target.querySelector('.label');
-		let hintNode;
+		const hintNode = await ShadowElement.create('hint');
 		
-		(constrainedAboutHint && (hintNode = document.getElementById(constrainedAboutHint))) ||
-			(
-				(hintNode = await ShadowElement.create('hint')).constrained = target,
-				hintNode.enterAnime = 'hint-spawn',
-				hintNode.leaveAnime = 'hint-exit',
-				hintNode.sbcvAfterAnime = 'enter-anime-begun',
-				hintNode.purgeAfterAnime = 'leave-anime-ended',
-				document.body.prepend(hintNode.element)
-			),
+		hintNode.constrained = target,
+		hintNode.enterAnime = 'hint-spawn',
+		hintNode.leaveAnime = 'hint-exit',
+		hintNode.sbcvAfterAnime = 'enter-anime-begun',
+		hintNode.purgeAfterAnime = 'leave-anime-ended';
 		
-		event.stopPropagation();
-		
+		return hintNode;
 	}
 	
-	static async enteredPost(event) {
+	static changedStorage(changes, areaName) {
 		
-		const { target } = event;
-		let node, handler;
+		const { configuration } = CopyXPost, { stored } = this;
+		let k,k0, changed, configurationItem, nv,ov;
 		
-		if (node = target.querySelector(CopyXPost.SELECTOR_CXP)) {
+		for (k in changes) 'newValue' in (changed = changes[k]) ? (stored[k] = changed.newValue) : delete stored[k];
+		
+		//coco storage内のデータの処理をconfigurationオブジェクトに一任させる作業の続き。
+		// できてる？
+		for (k in changes) {
 			
-			handler = node.handler,
-			node.toggleAttribute('data-cxp-left', false);
-			
-		} else {
-			
-			const	{ SELECTOR_CARET, createCXP, enteredButton, exitedAnimation, leftButton, leftPost } = CopyXPost,
-					{ shadowRoot } = node = await createCXP();
-			
-			handler = node.handler;
-			
-			for (const button of shadowRoot.querySelectorAll('#buttons button'))
-				handler.addLifetimeEvent('mouseenter', enteredButton, undefined, button);
-			
-			//target.querySelector(SELECTOR_CARET)?.parentElement.prepend?.(node = node.element);
-			target.querySelector(SELECTOR_CARET)?.parentElement.parentElement.parentElement.parentElement.
-				prepend?.(node = node.element);
+			if (k in configuration) {
+				
+				configurationItem = configuration[k];
+				
+				if ('newValue' in (changed = changes[k])) {
+					
+					
+					for (k0 in (nv = changed.newValue))
+						k0 in configurationItem && configurationItem[k0]?.update?.call?.(this, nv[k0]);
+					
+					for (k0 in (ov = changed.oldValue))
+						k0 in configurationItem && !(k0 in nv) && configurationItem[k0]?.remove?.call?.(this, ov[k0]);
+					
+				}
+				
+			}
+			// 以下の処理を除去できるようにする。
+			//switch (k) {
+			//	
+			//	case 'settings':
+			//	
+			//	if ('newValue' in (change = changes[k])) {
+			//		
+			//		const changed = change.newValue;
+			//		let k0;
+			//		
+			//		for (k0 in changed) {
+			//			
+			//			settings[k0] = changed;
+			//			
+			//			switch (k0) {
+			//				
+			//				case 'interface':
+			//				
+			//				const v = changed[k0];
+			//				
+			//				for (const shadow of document.querySelectorAll('[shadow]'))
+			//					shadow.dataset.cxpInterface = v;
+			//				
+			//				break;
+			//				
+			//			}
+			//			
+			//		}
+			//		
+			//	} else if ('oldValue' in change) {
+			//		
+			//		const changed = change.oldValue;
+			//		let k0;
+			//		
+			//		for ()
+			//		
+			//	}
+			//	
+			//	break;
+			//	
+			//}
 			
 		}
 		
-		node instanceof Element && handler instanceof ShadowElement &&
-			node.toggleAttribute('data-cxp-exited', false);
+	}
+	
+	static async enteredButton(event) {
+		
+		event.stopPropagation();
+		
+		const { target } = event, { dataset: { constrainedAboutHint } } = target;
+		
+		(constrainedAboutHint && document.getElementById(constrainedAboutHint)) ||
+			document.body.prepend((await CopyXPost.constrainedHint(target)).element);
+		
+	}
+	
+	static initializing(rs, rj) {
+		
+		const { constructor: { SELECTOR_REACT_ROOT, bodyObserverInit } } = this;
+		
+		(this.XRootNode = document.querySelector(SELECTOR_REACT_ROOT)) ?
+			rs(this.XRootNode) :
+			(
+				this.bodyObserver =
+					new MutationObserver
+						(
+							mrs =>	{
+										const	XRootNode =
+													document.querySelector(SELECTOR_REACT_ROOT);
+										
+										XRootNode &&	(
+															this.bodyObserver.disconnect(),
+															rs(this.XRootNode = XRootNode)
+														);
+									}
+						)
+			).observe(document.body, bodyObserverInit);
 		
 	}
 	
@@ -121,102 +328,328 @@ class CopyXPost {
 		
 	}
 	
+	static loading(storage) {
+		
+		const { changedStorage, initializing, startup } = this;
+		
+		this.stored = storage,
+		
+		browser.storage.local.onChanged.addListener(changedStorage);
+		
+		return storage?.settings?.interfaceName === 'disuse' || new Promise(initializing).then(startup);
+		
+	}
+	
+	//static async mutatedRootNodeChildList(mrs) {
+	//	
+	//	const	{ runtime } = browser,
+	//			{ getElementsFromMRs } = ShadowElement,
+	//			{
+	//				constructor: { SELECTOR_CXP, SELECTOR_NEW_POST_BUTTON, SELECTOR_POST, setCXP },
+	//				stored: { settings = {} }
+	//			} = this,
+	//			{ added: posts, removed: removedPosts } = getElementsFromMRs(mrs, SELECTOR_POST, true),
+	//			{ length: postsLength } = posts,
+	//			{ added: [ newPostButton ] } = getElementsFromMRs(mrs, SELECTOR_NEW_POST_BUTTON, true);
+	//	
+	//	if (settings.interfaceName !== 'disabled' && postsLength) {
+	//		
+	//		if (settings.visibleAlways) {
+	//			
+	//			let i;
+	//			
+	//			i = -1, this.mutePosts(posts);
+	//			while (++i < postsLength) setCXP(posts[i], settings);
+	//			
+	//		} else this.listenPosts(posts);
+	//		
+	//	} 
+	//	
+	//	removedPosts.length && this.mutePosts(removedPosts),
+	//	
+	//	newPostButton &&
+	//		document.body.style.setProperty('--accent-color', getComputedStyle(newPostButton).backgroundColor);
+	//	
+	//}
+	
+	static closestAll(targets, selector) {
+		
+		const { length } = targets;
+		
+		if (length) {
+			
+			const results = [];
+			let i,i0, v;
+			
+			i = i0 = -1;
+			while (++i < length)
+				(v = (v = targets[i])?.matches?.(selector) || v?.closest?.(selector)) && (results[++i0] = v);
+			
+			return results;
+			
+		}
+		
+		return [];
+		
+	}
+	
 	static async mutatedRootNodeChildList(mrs) {
 		
 		const	{ runtime } = browser,
 				{ getElementsFromMRs } = ShadowElement,
-				{ SELECTOR_CXP, SELECTOR_NEW_POST_BUTTON, SELECTOR_POST } = CopyXPost,
-				{ added: posts, removed: removedPosts } = getElementsFromMRs(mrs, SELECTOR_POST),
-				{ added: newPostButtons } = getElementsFromMRs(mrs, SELECTOR_NEW_POST_BUTTON),
+				{
+					constructor: { SELECTOR_CARET, SELECTOR_NEW_POST_BUTTON, SELECTOR_POST, closestAll },
+					stored: { settings = {} }
+				} = this,
+				{ added: carets, removed: removedCarets } = getElementsFromMRs(mrs, SELECTOR_CARET),
+				posts = closestAll(carets, SELECTOR_POST),
+				removedPosts = closestAll(removedCarets, SELECTOR_POST),
 				{ length: postsLength } = posts,
-				{ length: removedPostsLength } = removedPosts,
-				{ length: newPostButtonsLength } = newPostButtons;
+				{ added: [ newPostButton ] } = getElementsFromMRs(mrs, SELECTOR_NEW_POST_BUTTON, true);
 		
-		if (postsLength) {
+		if (settings.interfaceName !== 'disabled' && postsLength) {
 			
-			const { SELECTOR_CARET, enteredPost, leftPost } = CopyXPost;
-			let i, post;
+			if (settings.visibleAlways) {
+				
+				const { constructor: { setCXP } } = this;
+				let i;
+				
+				i = -1, this.mutePosts(posts);
+				while (++i < postsLength) setCXP(posts[i], settings);
+				
+			} else this.listenPosts(posts);
 			
-			i = -1;
-			while (++i < postsLength)	(
-											!(post = posts[i]).querySelector(SELECTOR_CXP) &&
-											post.querySelector(SELECTOR_CARET)
-										) &&
-											(
-												post.addEventListener('mouseenter', enteredPost),
-												post.addEventListener('mouseleave', leftPost)
-											);
-			
-		}
+		} 
 		
-		if (removedPostsLength) {
-			
-			const { enteredPost, leftPost } = CopyXPost;
-			let i, post;
-			
-			i = -1;
-			while (++i < removedPostsLength)	(post = removedPosts[i]).removeEventListener('mouseenter', enteredPost),
-												post.removeEventListener('mouseleave', leftPost);
-			
-		}
+		removedPosts.length && this.mutePosts(removedPosts),
 		
-		newPostButtonsLength &&
-			document.body.style.setProperty('--accent-color', getComputedStyle(newPostButtons[0]).backgroundColor);
+		newPostButton &&
+			document.body.style.setProperty('--accent-color', getComputedStyle(newPostButton).backgroundColor);
 		
 	}
 	
-	static startup(xRootNode) {
+	static startup(XRootNode) {
 		
-		(this.rootObserver = new MutationObserver(this.mutatedRootNodeChildList)).
-			observe(xRootNode, CopyXPost.rootObserverInit);
+		const	{
+					constructor:	{
+										SELECTOR_CARET,
+										SELECTOR_POST,
+										closestAll,
+										listenPosts,
+										rootObserverInit
+									},
+					shownContextMenu,
+					stored: { settings },
+				} = this,
+				{ addsContextMenu, copiesWhenContextMenuIsShown, interfaceName, visibleAlways } = settings,
+				posts = closestAll(XRootNode.querySelectorAll(SELECTOR_CARET), SELECTOR_POST),
+				{ length } = posts;
+		
+		copiesWhenContextMenuIsShown ?
+			addEventListener('contextmenu', shownContextMenu, { signal: this.getSignal('post') }) :
+			removeEventListener('contextmenu', shownContextMenu);
+		
+		if (interfaceName !== 'disabled' && length) {
+			
+			if (visibleAlways) {
+				
+				const { constructor: { setCXP } } = this;
+				let i;
+				
+				i = -1, this.mutePosts(posts);
+				while (++i < length) setCXP(posts[i], settings);
+				
+			} else this.listenPosts(posts);
+			
+		}
+		
+		(this.rootObserver = new MutationObserver(this.mutatedRootNodeChildList)).observe(XRootNode, rootObserverInit);
 		
 	}
 	
 	constructor() {
 		
-		const { mutatedRootNodeChildList, startup } = CopyXPost;
+		super();
 		
+		const	{
+					constructor:	{
+										changedStorage,
+										initializing,
+										loading,
+										mutatedRootNodeChildList,
+										startup
+									}
+				} = this;
+		
+		this.ac = {},
+		
+		//browser.menus.onClicked.addListener((info, tab) => hi(info.targetElementId,browser.menus.getTargetElement(info.targetElementId))),
+		
+		//browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+		//	
+		//	if (message && typeof message === 'object') {
+		//		switch (message.type) {
+		//			
+		//			case 'menu':
+		//			hi(message, message.info.targetElementId, browser.menus.getTargetElement(message.info.targetElementId));
+		//			break;
+		//			
+		//		}
+		//	}
+		//	
+		//}),
+		
+		this.changedStorage = changedStorage.bind(this),
+		this.initializing = initializing.bind(this),
+		this.loading = loading.bind(this),
 		this.mutatedRootNodeChildList = mutatedRootNodeChildList.bind(this),
 		this.startup = startup.bind(this);
 		
 	}
 	
+	//abort(key) {
+	//	
+	//	const { ac } = this;
+	//	
+	//	return key in ac && !!ac[key].abort();
+	//	
+	//}
+	
+	purge() {
+		
+		const { bodyObserver, changedStorage, intersectionObserver, rootObserver } = this;
+		
+		this.abort('post'),
+		
+		browser.storage.local.onChanged.removeListener(changedStorage),
+		
+		bodyObserver?.disconnect?.(),
+		rootObserver?.disconnect?.();
+		
+	}
+	
+	//getSignal(key) {
+	//	
+	//	const { ac } = this;
+	//	
+	//	return ((key in ac && !ac[key].signal.aborted) ? ac[key] : (ac[key] = new AbortController())).signal;
+	//	
+	//}
+	
 	init() {
 		
-		const	{ SELECTOR_REACT_ROOT, bodyObserverInit } = CopyXPost,
-				{ startup } = this,
-				initializing = (rs, rj) => {
-					
-					(this.xRootNode = document.querySelector(SELECTOR_REACT_ROOT)) ?
-						rs(this.xRootNode) :
-						(
-							this.bodyObserver =
-								new MutationObserver
-									(
-										mrs =>	{
-													const xRootNode = document.querySelector(SELECTOR_REACT_ROOT);
-													
-													xRootNode &&	(
-																		this.bodyObserver.disconnect(),
-																		rs(this.xRootNode = xRootNode)
-																	);
-												}
-									)
-						).observe(document.body, bodyObserverInit);
-					
-				};
+		return	this.initialized =	fetch(browser.runtime.getURL('storage-default.json')).
+										then(response => response.json()).
+										then(key => browser.storage.local.get(key)).
+										then(this.loading);
 		
-		return this.initialized = new Promise(initializing).then(startup);
+	}
+	
+	listenPosts(posts) {
+		
+		if (posts && typeof posts === 'object') {
+			
+			const { length } = posts;
+			
+			if (length ? posts : posts instanceof Element && (posts = [ posts ])) {
+				
+				const	{ SELECTOR_CXP, SELECTOR_CARET, leftPost } = CopyXPost,
+						{ enteredPost } = this,
+						eventOption = { signal: this.getSignal('post') };
+				let i, post;
+				
+				i = -1;
+				while (++i < length)	(
+											(post = posts[i]) instanceof Element &&
+											!post.querySelector(SELECTOR_CXP) &&
+											post.querySelector(SELECTOR_CARET)
+										) &&
+											(
+												post.addEventListener('mouseenter', enteredPost, eventOption),
+												post.addEventListener('mouseleave', leftPost, eventOption)
+											);
+				
+			}
+			
+		}
+		
+	}
+	
+	mutePosts(posts) {
+		
+		if (posts && typeof posts === 'object') {
+			
+			const { length } = posts;
+			
+			if (length ? posts : posts instanceof Element && (posts = [ posts ])) {
+				
+				const { leftPost } = CopyXPost, { enteredPost } = this;
+				let i, post;
+				
+				i = -1;
+				while (++i < length)	(post = posts[i]) instanceof Element &&
+											(
+												post.removeEventListener('mouseenter', enteredPost),
+												post.removeEventListener('mouseleave', leftPost)
+											);
+				
+			}
+			
+		}
 		
 	}
 	
 }
 
-class ShadowScraperElement extends ShadowInteractiveElement {
+class ShadowCXPInteractiveElement extends ShadowInteractiveElement {
+	
+	static {
+		
+		this[Logger.$icon] = '󠁪󠁪󠁪󠀽🧩:' + CopyXPost[Logger.$icon];
+		this[Logger.$name] = CopyXPost[Logger.$name],
+		this[Logger.$namePrefix] = CopyXPost[Logger.$namePrefix],
+		this[Logger.$nameSuffix] = CopyXPost[Logger.$nameSuffix];
+		
+	}
+	
+	constructor() {
+		
+		super();
+		
+		const { constructor } = this;
+		
+		const boundFunctions = this.getBound(constructor.merge(constructor, 'bound'));
+		
+		for (const k in boundFunctions) this[k] = boundFunctions[k];
+		
+	}
+	
+}
+
+class ShadowScraperElement extends ShadowCXPInteractiveElement {
 	
 	static {
 		
 		this.$scrapers = Symbol('ShadowScraperElement.scrapers');
+		
+	}
+	
+	static scrape(node, scrapers) {
+		
+		if (node instanceof Element) {
+			
+			const { assign } = Object, scraped = {};
+			let i,l, v;
+			
+			i = -1, l = (Array.isArray(scrapers) ? scrapers : [ scrapers ]).length;
+			while (++i < l)	typeof (typeof (v = scrapers[i]) === 'function' ?
+								(v = v(node, scraped)) : v) && typeof v === 'object' && assign(scraped, v);
+			
+			return scraped;
+			
+		}
+		
+		return {};
 		
 	}
 	
@@ -235,20 +668,7 @@ class ShadowScraperElement extends ShadowInteractiveElement {
 	
 	scrape(node) {
 		
-		if (node instanceof Element) {
-			
-			const { assign } = Object, { $scrapers } = ShadowScraperElement, scrapers = this[$scrapers], scraped = {};
-			let i,l, v;
-			
-			i = -1, l = (Array.isArray(scrapers) ? scrapers : [ scrapers ]).length;
-			while (++i < l)	typeof (typeof (v = scrapers[i]) === 'function' ?
-								(v = v(node, scraped)) : v) && typeof v === 'object' && assign(scraped, v);
-			
-			return scraped;
-			
-		}
-		
-		return {};
+		return ShadowScraperElement.scrape(node, this[ShadowScraperElement.$scrapers]);
 		
 	}
 	
@@ -273,14 +693,15 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 	
 	static clickedCopyButton(event) {
 		
-		const	{ copied } = ShadowCopyXPostElement,
-				{ element } = this,
-				scraped = this.scrape(element.closest(ShadowCopyXPostElement.SELECTOR_POST)),
-				{ plainPostText } = scraped;
-		//hi(scraped);
-		plainPostText && navigator.clipboard.writeText(plainPostText.join('')).then(copied.bind(this, event.target));
-		
 		event.preventDefault(), event.stopPropagation();
+		
+		const	{ constructor: { SELECTOR_POST, copied }, element } = this,
+				{ target } = event,
+				scraped = this.scrape(element.closest(SELECTOR_POST)),
+				{ plainPostText } = scraped;
+		
+		plainPostText &&	navigator.clipboard.writeText(plainPostText.join('')).
+								then(text => copied.call(this, target, text, scraped));
 		
 	}
 	
@@ -339,7 +760,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 			balloon?.hasAttribute?.('leave-anime-begun') ||
 				(
 					balloon ?
-						animationName === handler.leaveAnime ?
+						handler.leaveAnime.includes(animationName) ?
 							(balloon.handler.resetAnime(), balloon.handler.finish = true) :
 							balloon.handler.finish && balloon.handler.resetAnime() :
 						target.removeEventListener(type, ShadowCopyXPostElement.notifyEndToBalloon)
@@ -349,7 +770,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 		
 	}
 	
-	static async copied(element) {
+	static async copied(element, data, scraped) {
 		
 		let balloon;
 		
@@ -365,14 +786,18 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 			balloon.appendChild(balloonContent),
 			
 			balloon.classList.add('checked', 'flat'),
-			balloon.enterAnime = 'balloon-spawn',
-			balloon.leaveAnime = 'exit',
+			balloon.enterAnime = 'balloon-spawn balloon-less-anime-initiate noop-initiate',
+			balloon.leaveAnime = 'exit balloon-less-anime-leave noop-leave',
 			//balloon.sbcvAfterAnime = 'enter-anime-begun',
 			balloon.purgeAfterAnime = 'leave-anime-ended',
+			//balloon.dataset.cxpInterface = element.getRootNode().host.dataset.cxpInterface,
+			balloon.dataset.cxpInterface = (element.getRootNode()?.host ?? element).dataset.cxpInterface,
 			document.body.prepend(balloon.element),
 			balloon.constrained = element;
 			
 		}
+		
+		this.info(scraped),
 		
 		balloon.handler.resetAnime();
 		
@@ -409,7 +834,7 @@ class ShadowCopyXPostElement extends ShadowScraperElement {
 }
 ShadowCopyXPostElement.define();
 
-class ShadowConstrainedElement extends ShadowInteractiveElement {
+class ShadowConstrainedElement extends ShadowCXPInteractiveElement {
 	
 	static {
 		
@@ -557,25 +982,60 @@ class ShadowPopupElement extends ShadowConstrainedElement {
 		
 	}
 	
+	static bound = {
+		
+		begunEnterAnime(event) {
+			
+			const	{ height, width } = visualViewport,
+					{ target } = event,
+					{ style } = target,
+					rect = target.getBoundingClientRect();
+			let k,v, top,right,bottom,left;
+			
+			for (k in rect)	typeof (v = rect[k]) === 'number' &&
+								(
+									k === 'top' || k === 'left' ?
+										(
+											style.setProperty
+												('--popup-out-of-bounds-' + k, (v = v < 0 ? v * -1 : 0) + 'px'),
+											k === 'top' ? (top = v) : (left = v)
+										) :
+									k === 'right' ?
+										style.setProperty
+											('--popup-out-of-bounds-' + k, (right = v > width ? v - width : 0) + 'px') :
+									k === 'bottom' &&
+										style.setProperty
+											('--popup-out-of-bounds-' + k, (bottom = v > height ? v - height : 0) + 'px')
+								);
+			hi(top,right,bottom,left);
+			style.setProperty('--popup-out-of-bounds-lr', (left || right) + 'px'),
+			style.setProperty('--popup-out-of-bounds-rl', (right || left) + 'px'),
+			style.setProperty('--popup-out-of-bounds-tb', (top || bottom) + 'px'),
+			style.setProperty('--popup-out-of-bounds-bt', (bottom || top) + 'px');
+			
+		},
+		
+		// このイベントハンドラーは、既に場に現われたヒントが、いったんそれに紐付けられた要素からカーソルが外れ、
+		// 退出処理（アニメ）が開始され始めた時に、再度紐付けられた要素にカーソルが合わせられた時にのみ起動することを想定している。
+		// 現状は問題ないが、例えば mouseenter 以外の方法でヒントを表示した場合に対応できないなど、汎用的な仕様ではないことが想像される。
+		enteredConstrained(event) {
+			
+			this.resetAnime();
+			
+		},
+		
+		leftConstrained(event) {
+			
+			this.enterAnimeBegun ? (this.exiting = true) : this.purge(undefined, true);
+			
+		}
+		
+	};
+	
 	static changedAnimationState(event) {
 		
 		//Object.getPrototypeOf(this.constructor).changedAnimationState.call(this, event, this.constrained);
-		ShadowInteractiveElement.changedAnimationState.call(this, event, this.constrained);
-		
-	}
-	
-	// このイベントハンドラーは、既に場に現われたヒントが、いったんそれに紐付けられた要素からカーソルが外れ、
-	// 退出処理（アニメ）が開始され始めた時に、再度紐付けられた要素にカーソルが合わせられた時にのみ起動することを想定している。
-	// 現状は問題ないが、例えば mouseenter 以外の方法でヒントを表示した場合に対応できないなど、汎用的な仕様ではないことが想像される。
-	static enteredConstrained(event) {
-		
-		this.resetAnime();
-		
-	}
-	
-	static leftConstrained(event) {
-		
-		this.enterAnimeBegun ? (this.exiting = true) : this.purge(undefined, true);
+		ShadowCXPInteractiveElement.changedAnimationState.call(this, event, this.constrained);
 		
 	}
 	
@@ -583,10 +1043,7 @@ class ShadowPopupElement extends ShadowConstrainedElement {
 		
 		super();
 		
-		const { enteredConstrained, leftConstrained } = ShadowPopupElement;
-		
-		this.enteredConstrained = enteredConstrained.bind(this),
-		this.leftConstrained = leftConstrained.bind(this);
+		this.addLifetimeEvent('enter-anime-begun', this.begunEnterAnime);
 		
 	}
 	
@@ -607,13 +1064,17 @@ class ShadowPopupElement extends ShadowConstrainedElement {
 		
 	}
 	
-	
 	set constrained(v) {
 		
-		const { element } = this;
-		
-		(v = this.constrain(v)) &&
-			(element.dataset.alt = ShadowElement.i18n(v.dataset.hintAlt), ShadowElement.setBoundToCSSVar(element, v));
+		if (v = this.constrain(v)) {
+			
+			const { element } = this, hintAlt = ShadowElement.i18n(v.dataset.hintAlt);
+			
+			hintAlt &&
+				(v.hasAttribute('data-hint-as-html') ? (element.innerHTML = hintAlt) : (element.dataset.alt = hintAlt)),
+			ShadowElement.setBoundToCSSVar(element, v);
+			
+		}
 		
 	}
 	get exiting() {

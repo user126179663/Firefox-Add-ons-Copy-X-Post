@@ -1,34 +1,35 @@
-class ShadowElement {
+class ShadowElement extends WXLogger {
 	
 	static {
 		
 		this.$ac = Symbol('ShadowElement.ac'),
 		this.$observedAttributes = Symbol('ShadowElement.observedAttributes'),
 		
-		this.parser = new DOMParser(),
-		
 		this.defined = {},
 		
-		this.tag = 'wrapper',
+		this.parser = new DOMParser(),
 		
-		this.shadowRootOption = { mode: 'open' };
+		this.shadowRootOption = { mode: 'open' },
+		
+		this.tag = 'wrapper';
 		
 	}
 	
-	static async define() {
+	static define() {
 		
-		const { defined, parser, tag, templateURL } = this;
+		const { defined, parser, tag, templateURL, toText } = this;
 		
 		defined[tag] =
-			templateURL ?	fetch(browser.runtime.getURL(templateURL)).then(response => response.text()).
-								then	(
-											text =>	(
-														this.template =	parser.parseFromString(text, 'text/html').
-																			querySelector('template'),
-														this
-													)
-										) :
-								Promise.resolve(this);
+			templateURL ?	fetch(browser.runtime.getURL(templateURL)).
+								then(toText).
+									then	(
+												text =>	(
+															this.template =	parser.parseFromString(text, 'text/html').
+																				querySelector('template'),
+															this
+														)
+											) :
+									Promise.resolve(this);
 		
 	}
 	
@@ -69,6 +70,12 @@ class ShadowElement {
 		
 	}
 	
+	static toText(response) {
+		
+		return response.text();
+		
+	}
+	
 	static composedSelect(rootNode, all, ...selectors) {
 		
 		const { length } = selectors, l = length - 1;
@@ -89,7 +96,10 @@ class ShadowElement {
 	// 第一引数 mrs に指定された MurationRecords プロパティ addedNodes, removedNodes を対象に、
 	// 第二引数 selector に一致する要素ないしその子孫か先祖を Array に列挙して戻り値にする。
 	// 未指定の場合、addedNodes, removedNodes に列挙された要素をそのまま返す。
-	static getElementsFromMRs(mrs, selector) {
+	// このメソッドの仕様は不完全で、例えばある要素を削除した直後にドキュメントに再接続した時に、
+	// mrs 上ではその変化が処理順で列挙されるため追跡可能だが、このメソッドの戻り値はその順序を考慮しないため追跡不能になる。
+	// これに対応するには戻り値の仕様を抜本的に変える必要があり、後方互換性が失われるため、このメソッドについては現状の仕様を維持する必要がある。
+	static getElementsFromMRs(mrs, selector, closestTo) {
 		
 		const	{ ELEMENT_NODE } = Node,
 				{ length } = mrs,
@@ -113,8 +123,18 @@ class ShadowElement {
 						
 						if (selector) {
 							
-							target.matches(selector) && (nodes[++i3] = target),
-							(selected = target.closest(selector)) && (nodes[++i3] = selected);
+							target.matches(selector) && nodes === (target.isConnected ? added : removed) &&
+								!nodes.includes(target) && (nodes[++i3] = target);
+							// 以下の、セレクターとの一致を先祖要素に対してまで確認する処理は、
+							// 意図しない動作を引き起こす可能性があるためコメント化している。
+							// しかし、この実装に依存している処理がないとは言い切れないので、もし以前は動いていた処理が
+							// 何も変更していないのに動かなくなった場合は、このコメント部分の処理を試してみる価値がある。
+							// ただし前述のようにこの実装を想定していない処理にとって非常にリスクが高いため代替策を検討すべき。
+							//(selected = target.closest(selector)) &&
+							//	!nodes.includes(selected) && (nodes[++i3] = selected);
+							// 上記問題に対して、先祖方向への一致の確認を任意で指定する第三引数 closestTo を実装したが、あくまで便宜的な対応。
+							closestTo && (selected = target.closest(selector)) &&
+								!nodes.includes(selected) && (nodes[++i3] = selected);
 							
 							if (l1 = (selected = target.querySelectorAll(selector)).length) {
 								
@@ -122,7 +142,8 @@ class ShadowElement {
 								while (++i1 < l1) {
 									i2 = -1, selectedNode = selected[i1];
 									while (++i2 < l2 && nodes[i2] !== selectedNode);
-									i2 === l2 && (nodes[i3 = l2++] = selectedNode);
+									i2 === l2 && nodes === (selectedNode.isConnected ? added : removed) &&
+										(nodes[i3 = l2++] = selectedNode);
 									
 								}
 								
@@ -252,6 +273,8 @@ class ShadowElement {
 	}
 	
 	constructor(element = 'div') {
+		
+		super();
 		
 		const { constructor: { tag, template } } = this;
 		
@@ -1130,10 +1153,24 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 				['value-string']: {
 					get(attributeName) { return function () { return this.element.getAttribute(attributeName) }; },
 					set(attributeName) { return function (v) { this.element.setAttribute(attributeName, v) }; }
+				},
+				['value-array']: {
+					get(attributeName) {
+						return	function () {
+									return this.element.getAttribute(attributeName)?.split?.(' ') ?? [];
+								};
+					},
+					set(attributeName) {
+						return	function (v) {
+									
+									this.element.setAttribute(attributeName, Array.isArray(v) ? v.join(' ') : v);
+									
+								};
+					}
 				}
 			},
 			property: {
-				'[]Anime': { handlerType: 'value-string', attributeName: '[]-anime' },
+				'[]Anime': { handlerType: 'value-array', attributeName: '[]-anime' },
 				'[]AnimeBegun': { handlerType: 'toggle', attributeName: '[]-anime-begun' },
 				'[]AnimeCanceled': { handlerType: 'toggle', attributeName: '[]-anime-canceled' },
 				'[]AnimeEnded': { handlerType: 'toggle', attributeName: '[]-anime-ended' },
@@ -1285,7 +1322,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 		let i, v;
 		
 		i = -1;
-		while (++i < length && ((v = anime[i]).eventType !== type || (this[v.valueName]) !== animationName));
+		while (++i < length && ((v = anime[i]).eventType !== type || !this[v.valueName].includes(animationName)));
 		
 		if (i !== length) {
 			
@@ -1304,7 +1341,9 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 												...elements
 											),
 			purgeAfterAnime?.includes?.(value) &&
-				this.purgeAfter({ event }, requirements ||= this.getCurrentStateAsRequirements(true));
+				this.purgeAfter({ event }, requirements ||= this.getCurrentStateAsRequirements(true)),
+			
+			element.dispatchEvent(new CustomEvent(value, { detail: { ...v } }));
 			
 		}
 		
@@ -1347,7 +1386,7 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 				{ constructor: { state: { anime, interactions } } } = this,
 				animation = {},
 				requirements = [];
-		let i,i0,l0, ri,ti, v,v0, cmd, av,iv, allowsAll, type, animationName, requirement;
+		let i,i0,l0,i1,l1,i2, ri,ti, v,v0,v1, cmd, av,iv, allowsAll, type, animationName, requirement;
 		
 		ri = ti = -1;
 		while (cmd !== 'sbcvAfter') {
@@ -1355,20 +1394,26 @@ class ShadowInteractiveElement extends ShadowAnimationConditionsElement {
 			if (av = this[(cmd = (cmd ? 'sbcv' : 'purge') + 'After') + 'Anime']) {
 				
 				i = i0 = -1, l0 = anime.length, allowsAll = !(isArray(av) && av.length);
-				while (++i0 < l0)
-					v = anime[i0],
-					(allowsAll || (this[v.name] && av.includes(v.value))) &&
-						(
-							(type = v.eventType) in animation ?
-								(animationName = animation[type].requirement.event.animationName):
-								(
-									animationName = [],
-									animation[type] = requirements[++ri] =
-										{ requirement: { event: { animationName, type } } }
-								),
-							animationName.includes(v0 = this[v.valueName]) ||
-								(animationName[animationName.length] = v0)
-						);
+				while (++i0 < l0) {
+					
+					v = anime[i0];
+					
+					if (allowsAll || (this[v.name] && av.includes(v.value))) {
+						
+						(type = v.eventType) in animation ?
+							(animationName = animation[type].requirement.event.animationName):
+							(
+								animationName = [],
+								animation[type] = requirements[++ri] =
+									{ requirement: { event: { animationName, type } } }
+							),
+						
+						i1 = -1, l1 = (v0 = this[v.valueName]).length, i2 = animationName.length;
+						while (++i1 < l1) animationName.includes(v1 = v0[i1]) || (animationName[++i2] = v1);
+						
+					}
+					
+				};
 				
 			}
 			

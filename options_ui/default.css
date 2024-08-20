@@ -1,0 +1,296 @@
+@import url('../css/default.css');
+
+@layer with-menu, without-menu;
+
+@layer without-menu {
+	
+	#container {
+		
+		flex: 0 1 auto;
+		
+	}
+	#storage-settings-buttons {
+		
+		flex-wrap: nowrap;
+		
+	}
+	
+}
+@layer with-menu {
+	
+	html {
+		scroll-behavior: smooth;
+	}
+	
+	#main-menu {
+		display: flex;
+		flex: 0 1 calc(100% * 1 / 4);
+		padding: 0;
+		position: sticky;
+		top: 1rem;
+	}
+	#main-menu ul {
+		
+		margin: 0;
+		padding: 0;
+		
+	}
+	#main-menu li {
+		
+		list-style: none;
+		
+	}
+	
+	#container {
+		
+		flex: 0 1 calc(100% * 3 / 4);
+		
+	}
+	#storage-settings-buttons {
+		
+		flex-wrap: wrap;
+		
+	}
+	
+}
+
+html.dev, body {
+	min-height: 100%;
+}
+.dev body {
+	justify-content: center;
+	overflow-x: hidden;
+}
+.local body {
+	padding: 0 5rem;
+}
+.dev #react-root {
+	flex: 1 0 auto;
+}
+
+html {
+	
+	overflow-x: hidden;
+	
+}
+html:not(.dev) .dev-only {
+	
+	display: none;
+	
+}
+
+body {
+	align-items: start;
+	display: flex;
+	overflow-x: hidden;
+}
+
+#container {
+	
+	display: flex;
+	flex-direction: column;
+	
+}
+
+#storage-area {
+	
+	margin-bottom: 1rem;
+	
+}
+#storage-settings {
+	
+	display: flex;
+	flex-direction: column;
+	
+}
+#storage-settings h3 {
+	
+	padding: 0;
+	
+}
+#storage-viewer {
+	height: 9rem;
+	width: 100%;
+}
+#storage-settings-buttons {
+	
+	display: flex;
+	justify-content: center;
+	
+}
+#storage-settings-buttons > * {
+	
+	flex: 0 1 33.3%;
+	
+}
+.storage-settings-node {
+	
+	font: normal normal normal .9rem/1.5 sans-serif;
+	padding: 0 .6rem;
+	
+}
+.storage-settings-node button {
+	
+	padding: .8rem;
+	font: normal normal normal 1rem/1 sans-serif;
+	
+}
+.storage-settings-controller {
+	
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	padding: 1rem;
+	
+}
+#storage-settings-buttons > button {
+	
+	width: max-content;
+	
+}
+#storage-settings-buttons input[type="file"] {
+	
+	display: none;
+	
+}
+
+article.post {
+	
+	border: 1px solid rgba(239,243,244,1);
+	display: flex;
+	font-size: 14px;
+	padding: 1rem;
+	
+}
+article.post .icon-pane {
+}
+article.post header {
+	
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	
+}
+article.post .icon {
+	
+	--icon-size: 36px;
+	
+	background: rgba(203,213,220,1);
+	border-radius: 100%;
+	height: var(--icon-size);
+	width: var(--icon-size);
+	
+}
+article.post .meta {
+	
+	display: flex;
+	
+}
+article.post .identity {
+	
+	display: flex;
+	
+}
+article.post .id {
+	
+	color: rgb(83, 100, 113);
+	margin-left: 4px;
+	
+}
+article.post .content-node {
+	
+	margin-left: 1rem;
+	
+}
+.dev article.post .content-node {
+	
+	flex: 1 1 auto;
+	
+}
+article.post .content {
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 1rem 0;
+	
+}
+article.post [data-testid="tweetText"] {
+	
+	margin: 0 0 1rem;
+	
+}
+
+article.post .information {
+	display: flex;
+	justify-content: center;
+}
+article.post #range-interface {
+	width: 100%;
+}
+
+article.post menu {
+	
+	--menu-icon-size: 1.3em;
+	--menu-icon-dot-size: 6px;
+	--menu-icon-dot-color: rgb(83, 100, 113);
+	
+	background: 1px center/var(--menu-icon-dot-size) var(--menu-icon-dot-size) repeat-x radial-gradient(circle at center, var(--menu-icon-dot-color) 25%, transparent 50%);
+	height: var(--menu-icon-size);
+	margin: 0;
+	padding: 0;
+	width: var(--menu-icon-size);
+	
+}
+
+article.post .dst {
+	
+	display: flex;
+	
+}
+
+.help {
+	
+	--hint-size: 1rem;
+	
+	align-items: center;
+	background: rgba(0,0,0,.3);
+	border-radius: 100%;
+	color: rgba(255,255,255,1);
+	display: inline-flex;
+	font: bold normal normal 100%/1 sans-serif;
+	height: var(--hint-size);
+	justify-content: center;
+	margin-right: .2rem;
+	width: var(--hint-size);
+	
+}
+.help::before {
+	content: "?";
+}
+
+article.post .options {
+	
+	display: flex;
+	flex-direction: column;
+	
+}
+
+.warn-icon {
+	
+	display: inline-block;
+	font: normal normal normal 1.25rem/1 sans-serif;
+	transform-origin: center bottom;
+	
+}
+.warn-icon:not([data-cxp-interface]), .warn-icon[data-cxp-interface="original"] {
+	
+	animation: bounce-infinite 2.7s ease-out 0s infinite normal forwards running;
+	
+}
+.warn-icon::before {
+	
+	content: "⚠️";
+	margin-right: .4rem;
+	
+}

@@ -1,11 +1,11 @@
+@import 'common.css';
+@import 'shadow-copy-x-post-hint.css';
+@import 'shadow-copy-x-post-balloon.css';
+
 [shadow="cxp"] {
 	
 	/*display: none;*/
-	margin-right: .45rem;
-	
-}
-[data-cxp-entered] {
-	
-	/*display: block;*/
+	/*margin-right: .45rem;*/
+	margin-right: .6rem;
 	
 }

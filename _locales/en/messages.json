@@ -11,5 +11,11 @@
 	"hintCopyButton": {
 		"message": "Copy Text",
 		"description": "A hint for copy button."
+	},
+	
+	"optionsInterfaceTitle": {
+		"message": "Interface",
+		"description": "A title for the interface section in options."
 	}
+	
 }

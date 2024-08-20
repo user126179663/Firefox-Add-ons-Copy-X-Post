@@ -22,6 +22,28 @@
 	--balloon-glimmer-bg-image:
 		linear-gradient(-75deg, transparent 0%, transparent 10%, white 10.1%, white 80%, transparent 90.1%);
 	
+	--balloon-animation-original-initiate: balloon-spawn var(--balloon-spawn-duration) ease 0s 1 normal forwards running;
+	--balloon-animation-original-leave: exit .3s ease-out 2s 1 reverse forwards running;
+	--balloon-animation-original-leave-immediately: exit .3s ease-out 0s 1 reverse forwards running;
+	--balloon-direction-animation-original-initiate:
+		balloon-direction-glimmer calc(var(--balloon-glimmer-duration) * 1.1) ease-out 0s 1 normal forwards running;
+	
+	--balloon-animation-less-anime-initiate:
+		balloon-less-anime-initiate var(--balloon-spawn-duration) ease 0s 1 normal forwards running;
+	--balloon-animation-less-anime-leave:
+		balloon-less-anime-leave .3s ease-out 2s 1 normal forwards running;
+	--balloon-animation-less-anime-leave-immediately:
+		balloon-less-anime-leave .3s ease-in 0s 1 normal forwards running;
+	--balloon-direction-animation-less-anime-initiate: none;
+	
+	--balloon-animation-no-anime-initiate:
+		noop-initiate 0s linear 0s 1 normal forwards running;
+	--balloon-animation-no-anime-leave:
+		noop-leave 0s linear 2s 1 normal forwards running;
+	--balloon-animation-no-anime-leave-immediately:
+		noop-leave 0s linear 0s 1 normal forwards running;
+	--balloon-direction-animation-no-anime-initiate: none;
+	
 	background: var(--balloon-bg-color);
 	border-radius: var(--balloon-border-radius);
 	box-shadow: var(--balloon-box-shadow-outline), var(--balloon-box-shadow-dropped);
@@ -51,6 +73,52 @@
 	--balloon-check-color: rgba(255,255,255,1);
 	
 }
+[shadow="balloon"] {
+	
+	--balloon-animation-initiate: var(--balloon-animation-original-initiate);
+	--balloon-animation-leave: var(--balloon-animation-original-leave);
+	--balloon-animation-leave-immediately: var(--balloon-animation-original-leave-immediately);
+	
+	--balloon-direction-animation-initiate: var(--balloon-direction-animation-original-initiate);
+	
+}
+[shadow="balloon"].checked {
+	
+	--balloon-checked-animation-initiate:
+		var(--balloon-animation-original-initiate),
+		balloon-glimmer var(--balloon-glimmer-duration) ease 0s 1 normal forwards running;
+	
+}
+[shadow="balloon"][data-cxp-interface="less-anime"] {
+	
+	--balloon-animation-initiate: var(--balloon-animation-less-anime-initiate);
+	--balloon-animation-leave: var(--balloon-animation-less-anime-leave);
+	--balloon-animation-leave-immediately: var(--balloon-animation-less-anime-leave-immediately);
+	--balloon-direction-animation-initiate: var(--balloon-direction-animation-less-anime-initiate);
+	
+	--balloon-direction-animation-initiate: var(--balloon-direction-animation-less-anime-initiate);
+	
+}
+[shadow="balloon"][data-cxp-interface="less-anime"].checked {
+	
+	--balloon-checked-animation-initiate: var(--balloon-animation-less-anime-initiate);
+	
+}
+[shadow="balloon"][data-cxp-interface="no-anime"] {
+	
+	--balloon-animation-initiate: var(--balloon-animation-no-anime-initiate);
+	--balloon-animation-leave: var(--balloon-animation-no-anime-leave);
+	--balloon-animation-leave-immediately: var(--balloon-animation-no-anime-leave-immediately);
+	--balloon-direction-animation-initiate: var(--balloon-direction-animation-no-anime-initiate);
+	
+	--balloon-direction-animation-initiate: var(--balloon-direction-animation-no-anime-initiate);
+	
+}
+[shadow="balloon"][data-cxp-interface="no-anime"].checked {
+	
+	--balloon-checked-animation-initiate: var(--balloon-animation-no-anime-initiate);
+	
+}
 [shadow="balloon"].flat:not(html) {
 	
 	--balloon-border-width-value: 0;
@@ -62,59 +130,23 @@
 	
 	--balloon-glimmer-duration: calc(var(--balloon-spawn-duration) * 1);
 	
-	animation: balloon-spawn var(--balloon-spawn-duration) ease 0s 1 normal forwards running;
+	animation: var(--balloon-animation-initiate);
 	
 }
 [shadow="balloon"].checked.initiated {
 	
-	animation:	balloon-spawn var(--balloon-spawn-duration) ease 0s 1 normal forwards running,
-				balloon-glimmer var(--balloon-glimmer-duration) ease 0s 1 normal forwards running;
-	
-}
-@keyframes balloon-spawn {
-	
-	0% {
-		background: rgba(255,255,255,1);
-		rotate: y 270deg;
-		translate: 0 .8rem;
-	}
-	67% {
-		background: var(--accent-color);
-		rotate: y 360deg;
-	}
-	100% {
-		translate: 0;
-		rotate: y 360deg;
-	}
-	
-}
-@keyframes balloon-glimmer {
-	
-	from {
-		
-		background:	calc(var(--balloon-glimmer-size-width) * -1) top/
-					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
-					no-repeat
-					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
-		
-	}
-	to {
-		
-		background:	calc(100% + var(--balloon-glimmer-size-width) * 1) top/
-					var(--balloon-glimmer-size-width) var(--balloon-glimmer-size-height)
-					no-repeat
-					var(--balloon-glimmer-bg-image), var(--balloon-bg-color);
-	}
+	animation: var(--balloon-checked-animation-initiate);
 	
 }
 [shadow="balloon"].initiated[enter-anime-ended] {
 	
-	animation: exit .3s ease-out 2s 1 reverse forwards running;
+	animation: var(--balloon-animation-leave);
 	
 }
 [shadow="balloon"].initiated[finish] {
 	
-	animation: exit .3s ease-out 0s 1 reverse forwards running !important;
+	
+	animation: var(--balloon-animation-leave-immediately) !important;
 	
 }
 [shadow="balloon"]::after,
@@ -143,7 +175,7 @@
 [shadow="balloon"].checked::before {
 	
 	transform-origin: center top;
-	animation: balloon-direction-glimmer calc(var(--balloon-glimmer-duration) * 1.1) ease-out 0s 1 normal forwards running;
+	animation: var(--balloon-direction-animation-initiate);
 	
 }
 @keyframes balloon-direction-glimmer {

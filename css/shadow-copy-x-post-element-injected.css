@@ -3,6 +3,43 @@
 	/*display: none !important;*/
 	/*デバッグ用*/ display: flex !important;
 	
+	--interface-no-anime-animation-initiate: in 0s linear 0s 1 normal forwards running;
+	--interface-no-anime-animation-enter: noop .0s linear 0s 1 normal forwards running;
+	--interface-no-anime-animation-leave: noop .0s linear 0s 1 normal forwards running;
+	--interface-no-anime-animation-press: down .0s linear 0s 1 normal forwards running;
+	--interface-no-anime-animation-release: up .0s linear 0s 1 normal forwards running;
+	--interface-no-anime-animation-exit: out 0s linear 0s 1 normal forwards running;
+	
+	--interface-less-anime-animation-initiate: fade-in .2s ease-out 0s 1 normal forwards running;
+	--interface-less-anime-animation-enter: noop .0s linear 0s 1 normal forwards running;
+	--interface-less-anime-animation-leave: noop .0s linear 0s 1 normal forwards running;
+	--interface-less-anime-animation-press: press .2s ease-out 0s 1 normal forwards running;
+	--interface-less-anime-animation-release: release .05s ease-in 0s 1 normal forwards running;
+	--interface-less-anime-animation-exit: fade-out .2s ease-out 0s 1 normal forwards running;
+	
+	--interface-original-animation-initiate: spawn .3s ease-out 0s 1 normal forwards running;
+	--interface-original-animation-enter: bounce .3s ease-out 0s 1 normal forwards running;
+	--interface-original-animation-leave: bounce-leave .3s ease-out 0s 1 normal forwards running;
+	--interface-original-animation-press: bounce-press .2s ease-in 0s 1 normal forwards running;
+	--interface-original-animation-release: bounce-release .2s cubic-bezier(.51,3.83,.72,-0.63) 0s 1 normal forwards running;
+	--interface-original-animation-exit: exit .3s ease-out 0s 1 reverse forwards running;
+	
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	
+}
+#root:hover::before {
+	
+	--size: 1.8rem;
+	background: var(--accent-color, rgb(29, 155, 240));
+	border-radius: 100%;
+	content: "";
+	height: var(--size);
+	opacity: .08;
+	position:absolute;
+	width: var(--size);
+	
 }
 
 #buttons button {
@@ -10,7 +47,6 @@
 	cursor: pointer;
 	
 }
-
 #buttons button .label {
 	
 	display: block;
@@ -19,99 +55,65 @@
 	transform-origin: center bottom;
 	
 }
+:host(*) #root {
+	
+	--animation-initiate: var(--interface-original-animation-initiate);
+	--animation-enter: var(--interface-original-animation-enter);
+	--animation-leave: var(--interface-original-animation-leave);
+	--animation-press: var(--interface-original-animation-press);
+	--animation-release: var(--interface-original-animation-release);
+	--animation-exit: var(--interface-original-animation-exit);
+	
+}
+:host([data-cxp-interface="less-anime"]) #root {
+	
+	--animation-initiate: var(--interface-less-anime-animation-initiate);
+	--animation-enter: var(--interface-less-anime-animation-enter);
+	--animation-leave: var(--interface-less-anime-animation-leave);
+	--animation-press: var(--interface-less-anime-animation-press);
+	--animation-release: var(--interface-less-anime-animation-release);
+	--animation-exit: var(--interface-less-anime-animation-exit);
+	
+}
+:host([data-cxp-interface="no-anime"]) #root {
+	
+	--animation-initiate: var(--interface-no-anime-animation-initiate);
+	--animation-enter: var(--interface-no-anime-animation-enter);
+	--animation-leave: var(--interface-no-anime-animation-leave);
+	--animation-press: var(--interface-no-anime-animation-press);
+	--animation-release: var(--interface-no-anime-animation-release);
+	--animation-exit: var(--interface-no-anime-animation-exit);
+	
+}
 :host(:not([data-cxp-left])) #buttons button:not([initiated]) .label {
 	
-	animation: spawn .3s ease-out 0s 1 normal forwards running;
+	animation: var(--animation-initiate);
 	
 }
 :host([data-cxp-left]) #buttons button .label {
 	
-	animation: exit .3s ease-out 0s 1 reverse forwards running !important;
+	animation: var(--animation-exit) !important;
 	
 }
 
 :host(:not([data-cxp-left])) #buttons button[entered]:not([enter-anime-ended]):not([enter-anime-canceled]):not([pressed]) .label {
 	
-	animation: bounce .3s ease-out 0s 1 normal forwards running;
+	animation: var(--animation-enter);
 	
 }
 :host(:not([data-cxp-left])) #buttons button[left] .label,
 :host(:not([data-cxp-left])) #buttons button[left][out-of-bound] .label {
 	
-	animation: bounce-leave .3s ease-out 0s 1 normal forwards running;
+	animation: var(--animation-leave);
 	
-}
-@keyframes bounce {
-	0% {
-		scale: 100% 100%;
-	}
-	33.3% {
-		opacity: 1;
-		scale: 130% 66.7%;
-	}
-	50% {
-		scale: 90% 120%;
-	}
-	75% {
-		scale: 110% 95%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
-}
-@keyframes bounce-leave {
-	0% {
-		scale: 100% 100%;
-	}
-	33.3% {
-		opacity: 1;
-		scale: 130% 66.7%;
-	}
-	50% {
-		scale: 90% 120%;
-	}
-	75% {
-		scale: 110% 95%;
-	}
-	100% {
-		scale: 100% 100%;
-	}
 }
 #buttons button[pressed]:not([out-of-bound]):not([interrupted-press-anime]) .label {
 	
-	animation: press .2s ease-in 0s 1 normal forwards running !important;
-	
-}
-@keyframes press {
-	
-	from {
-		
-		scale: 1;
-		
-	}
-	to {
-		
-		scale: .9;
-		
-	}
+	animation: var(--animation-press) !important;
 	
 }
 #buttons button[released]:not([release-anime-ended]):not([interrupted-release-anime]) .label {
 	
-	animation: shake .2s cubic-bezier(.51,3.83,.72,-0.63) 0s 1 normal forwards running !important;
-	
-}
-@keyframes shake {
-	
-	0% {
-		
-		scale: 1.4;
-		
-	}
-	100% {
-		
-		scale: 1;
-		
-	}
+	animation: var(--animation-release) !important;
 	
 }

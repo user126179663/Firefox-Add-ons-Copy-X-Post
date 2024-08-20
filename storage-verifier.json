@@ -1,0 +1,7 @@
+{
+	"settings": {
+		"addsContextMenu": [ true, false ],
+		"interfaceName": [ "original", "less-anime", "no-anime", "disuse" ],
+		"visibleAlways": [ true, false ]
+	}
+}

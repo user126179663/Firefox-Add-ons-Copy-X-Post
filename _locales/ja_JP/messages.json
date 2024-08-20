@@ -11,5 +11,10 @@
 	"hintCopyButton": {
 		"message": "テキストをコピーする",
 		"description": "コピーボタンのヒント。"
+	},
+	
+	"optionsInterfaceTitle": {
+		"message": "インターフェース",
+		"description": "オプション内のインターフェース部を示すタイトル。"
 	}
 }
